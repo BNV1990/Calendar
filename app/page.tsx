@@ -1,6 +1,9 @@
 "use client";
 
 import React, { useEffect, useState, useCallback } from "react";
+import Legend from "./components/Legend";
+import MonthlySummary from "./components/MonthlySummary";
+import Calendar from "./components/Calendar";
 
 interface ShiftInfo {
   year: number;
@@ -263,59 +266,22 @@ const UkrainianCalendar = () => {
         </div>
       </div>
 
-      <div className="calendar-header">
-        <button id="prev-month-button" onClick={prevMonth}>
-          {"< Попередній"}
-        </button>
-        <h2 id="month-year-header">{`${
-          UKRAINIAN_MONTH_NAMES[currentDate.getMonth()]
-        } ${currentDate.getFullYear()}`}</h2>
-        <button id="next-month-button" onClick={nextMonth}>
-          {"Наступний >"}
-        </button>
-      </div>
+      <Calendar
+        calendarRows={calendarRows}
+        currentDate={currentDate}
+        monthNames={UKRAINIAN_MONTH_NAMES}
+        prevMonth={prevMonth}
+        nextMonth={nextMonth}
+      />
 
-      <table id="calendar-table">
-        <thead>
-          <tr>
-            <th>Пн</th>
-            <th>Вт</th>
-            <th>Ср</th>
-            <th>Чт</th>
-            <th>Пт</th>
-            <th>Сб</th>
-            <th>Нд</th>
-          </tr>
-        </thead>
-        <tbody id="calendar-body">{calendarRows}</tbody>
-      </table>
+      <div className="legend-and-summary-container" style={{ display: 'flex', gap: '20px' }}>
+        <Legend />
 
-      <div className="legend-and-summary-container">
-        <div className="legend">
-          <h3>Легенда:</h3>
-          <p>
-            <span className="legend-color day-shift-legend"></span> Денна зміна
-          </p>
-          <p>
-            <span className="legend-color night-shift-legend"></span> Нічна зміна
-          </p>
-          <p>
-            <span className="legend-color off-day-legend"></span> Вихідний день
-          </p>
-        </div>
-
-        <div className="hours-summary">
-          <h3>Підсумок годин за місяць:</h3>
-          <p>
-            Загальна кількість годин: <span id="total-hours">{totalHours}</span>
-          </p>
-          <p>
-            Денних годин: <span id="day-hours">{dayHours}</span>
-          </p>
-          <p>
-            Нічних годин: <span id="night-hours">{nightHours}</span>
-          </p>
-        </div>
+        <MonthlySummary
+          totalHours={totalHours}
+          dayHours={dayHours}
+          nightHours={nightHours}
+        />
       </div>
     </div>
   );
