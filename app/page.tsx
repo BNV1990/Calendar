@@ -83,7 +83,7 @@ const UkrainianCalendar = () => {
 
     for (let i = 0; i < 6; i++) {
       // Макс 6 тижнів
-      const weekCells: JSX.Element[] = [];
+      const weekCells: React.JSX.Element[] = [];
       for (let j = 0; j < 7; j++) {
         // 7 днів на тиждень
         if (i === 0 && j < adjustedFirstDay) {
