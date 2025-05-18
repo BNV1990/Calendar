@@ -197,25 +197,27 @@ body {
 }
 
 .legend {
-    margin-top: 30px; /* Increased top margin */
-    padding-top: 20px; /* Increased top padding */
-    border-top: 1px solid #e0e0e0; /* Lighter border */
+    margin-top: 0; /* Increased top margin */
+    padding-top: 0; /* Increased top padding */
+    border-top: none; /* Lighter border */
     text-align: left;
 }
 
 .legend h3 {
     margin-top: 0;
-    margin-bottom: 15px; /* Increased bottom margin */
-    font-size: 1.2em; /* Slightly larger font */
+    margin-bottom: 10px; /* Adjusted bottom margin for consistency */
+    font-size: 1.2em;
     color: #333;
 }
 
 .legend p {
-    margin: 8px 0; /* Adjusted margin */
+    margin: 0; /* Adjusted margin for consistency */
+    padding: 5px 0; /* Add padding for consistent vertical spacing */
     display: flex;
     align-items: center;
     font-size: 1em;
     color: #555;
+    line-height: 1.5; /* Explicitly set line height */
 }
 
 .legend-color {
@@ -273,29 +275,42 @@ body {
 }
 
 .hours-summary {
-    margin-top: 30px; /* Increased top margin */
-    padding-top: 20px; /* Increased top padding */
-    border-top: 1px solid #e0e0e0; /* Lighter border */
+    margin-top: 0; /* Increased top margin */
+    padding-top: 0; /* Increased top padding */
+    border-top: none; /* Lighter border */
     text-align: left;
     color: #333;
 }
 
 .hours-summary h3 {
     margin-top: 0;
-    margin-bottom: 15px; /* Increased bottom margin */
+    margin-bottom: 10px; /* Adjusted bottom margin for consistency */
     font-size: 1.2em;
     color: #333;
 }
 
 .hours-summary p {
-    margin: 8px 0;
+    margin: 0; /* Adjusted margin for consistency */
+    padding: 5px 0; /* Add padding for consistent vertical spacing */
     font-size: 1em;
     color: #555;
+    line-height: 1.5; /* Explicitly set line height */
 }
 
 .hours-summary span {
     font-weight: bold;
     color: #007bff; /* Primary blue for emphasis */
+    vertical-align: middle; /* Align text vertically */
+}
+
+.legend-and-summary-container {
+  display: flex;
+  justify-content: flex-start; /* Adjust as needed */
+  align-items: flex-start; /* Align items to the top */
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 1px solid #e0e0e0;
+  gap: 20px; /* Reduced space between the two blocks */
 }
 
 td.highlight-day-shift span.day-number {
