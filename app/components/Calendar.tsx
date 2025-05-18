@@ -30,20 +30,22 @@ const Calendar: React.FC<CalendarProps> = ({
         </button>
       </div>
 
-      <table id="calendar-table">
-        <thead>
-          <tr>
-            <th>Пн</th>
-            <th>Вт</th>
-            <th>Ср</th>
-            <th>Чт</th>
-            <th>Пт</th>
-            <th>Сб</th>
-            <th>Нд</th>
-          </tr>
-        </thead>
-        <tbody id="calendar-body">{calendarRows}</tbody>
-      </table>
+      <div className="calendar-table-container">
+        <table id="calendar-table">
+          <thead>
+            <tr>
+              <th>Пн</th>
+              <th>Вт</th>
+              <th>Ср</th>
+              <th>Чт</th>
+              <th>Пт</th>
+              <th>Сб</th>
+              <th>Нд</th>
+            </tr>
+          </thead>
+          <tbody id="calendar-body">{calendarRows}</tbody>
+        </table>
+      </div>
     </>
   );
 };

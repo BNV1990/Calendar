@@ -325,3 +325,36 @@ td.highlight-day-shift span.day-number {
   font-weight: bold;
   color: red;
 }
+
+@media (max-width: 600px) {
+  #calendar-table th,
+  #calendar-table td {
+    padding: 6px 1px; /* Further reduced padding */
+    font-size: 0.7em; /* Smaller font */
+    min-width: 35px; /* Minimum width for cells */
+  }
+
+  .legend-and-summary-container {
+    grid-template-columns: 1fr; /* Stack legend and summary vertically */
+    gap: 20px; /* Reduced gap */
+  }
+
+  #month-year-header {
+    font-size: 1.2em; /* Further reduced font size for header on mobile */
+    margin: 0 5px; /* Further reduced horizontal margin */
+  }
+
+  .calendar-header button {
+    padding: 4px 8px; /* Further reduced button padding */
+    font-size: 0.9em; /* Smaller font for buttons */
+  }
+
+  .calendar-table-container {
+    width: 100%; /* Ensure container takes full width */
+    overflow-x: auto; /* Enable horizontal scrolling */
+  }
+
+  .hours-summary h3 {
+    text-align: left; /* Align hours summary header to the left on mobile */
+  }
+}

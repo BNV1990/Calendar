@@ -43,11 +43,7 @@ const UkrainianCalendar = () => {
     (targetDate: Date, bsInfo: ShiftInfo | null): string | null => {
       if (!bsInfo) return null;
 
-      const baseDateMidnight = new Date(
-        bsInfo.year,
-        bsInfo.month,
-        bsInfo.day
-      );
+      const baseDateMidnight = new Date(bsInfo.year, bsInfo.month, bsInfo.day);
       const targetDateMidnight = new Date(
         targetDate.getFullYear(),
         targetDate.getMonth(),
@@ -126,7 +122,7 @@ const UkrainianCalendar = () => {
               shiftTypeForCell === "D"
             ) {
               cellClassName = "day-shift highlight-day-shift";
-              dayNumberStyle = { fontWeight: 'bold', color: 'red' };
+              dayNumberStyle = { fontWeight: "bold", color: "red" };
             } else if (shiftTypeForCell === "D") {
               cellClassName = "day-shift";
             } else if (shiftTypeForCell === "N") {
@@ -166,7 +162,9 @@ const UkrainianCalendar = () => {
           weekCells.push(
             <td key={date} className={cellClassName}>
               {hoursSpan}
-              <span className="day-number" style={dayNumberStyle}>{date}</span>
+              <span className="day-number" style={dayNumberStyle}>
+                {date}
+              </span>
             </td>
           );
           date++;
@@ -183,6 +181,22 @@ const UkrainianCalendar = () => {
       nightH: currentMonthNightHours,
     };
   }, [currentDate, baseShiftInfo, getShiftForDate]); // Corrected dependencies
+
+  useEffect(() => {
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker
+        .register("/service-worker.js")
+        .then((registration) => {
+          console.log(
+            "Service Worker registered with scope:",
+            registration.scope
+          );
+        })
+        .catch((error) => {
+          console.error("Service Worker registration failed:", error);
+        });
+    }
+  }, []);
 
   const applyShift = () => {
     const day = parseInt(baseDayInput);
@@ -274,7 +288,7 @@ const UkrainianCalendar = () => {
         nextMonth={nextMonth}
       />
 
-      <div className="legend-and-summary-container" style={{ display: 'flex', gap: '20px' }}>
+      <div className="legend-and-summary-container">
         <Legend />
 
         <MonthlySummary
