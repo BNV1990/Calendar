@@ -372,6 +372,6 @@ td.highlight-day-shift span.day-number {
   }
 
   .control-buttons-wrapper button {
-    font-size: 0.9em; /* Smaller font size for control buttons on mobile */
+    font-size: 0.8em; /* Further reduced font size for control buttons on mobile */
   }
 }
