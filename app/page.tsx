@@ -1,103 +1,322 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import React, { useEffect, useState, useCallback } from "react";
+
+interface ShiftInfo {
+  year: number;
+  month: number;
+  day: number;
+}
+
+// Define constants outside the component so they are stable references
+const SHIFT_CYCLE_VALUES = ["D", "N", "O1", "O2"]; // День, Ніч, Вихідний1, Вихідний2
+const UKRAINIAN_MONTH_NAMES = [
+  "Січень",
+  "Лютий",
+  "Березень",
+  "Квітень",
+  "Травень",
+  "Червень",
+  "Липень",
+  "Серпень",
+  "Вересень",
+  "Жовтень",
+  "Листопад",
+  "Грудень",
+];
+
+const UkrainianCalendar = () => {
+  const [currentDate, setCurrentDate] = useState(new Date());
+  const [baseShiftInfo, setBaseShiftInfo] = useState<ShiftInfo | null>(null);
+  const [baseDayInput, setBaseDayInput] = useState("");
+  const [calendarRows, setCalendarRows] = useState<JSX.Element[]>([]);
+
+  // State for hours summary
+  const [totalHours, setTotalHours] = useState(0);
+  const [dayHours, setDayHours] = useState(0);
+  const [nightHours, setNightHours] = useState(0);
+
+  const getShiftForDate = useCallback(
+    (targetDate: Date, bsInfo: ShiftInfo | null): string | null => {
+      if (!bsInfo) return null;
+
+      const baseDateMidnight = new Date(
+        bsInfo.year,
+        bsInfo.month,
+        bsInfo.day
+      );
+      const targetDateMidnight = new Date(
+        targetDate.getFullYear(),
+        targetDate.getMonth(),
+        targetDate.getDate()
+      );
+
+      const diffInMilliseconds =
+        targetDateMidnight.getTime() - baseDateMidnight.getTime();
+      const diffInDays = Math.round(diffInMilliseconds / (1000 * 60 * 60 * 24));
+
+      // Use the stable SHIFT_CYCLE_VALUES
+      const cycleIndex =
+        ((diffInDays % SHIFT_CYCLE_VALUES.length) + SHIFT_CYCLE_VALUES.length) %
+        SHIFT_CYCLE_VALUES.length;
+      return SHIFT_CYCLE_VALUES[cycleIndex];
+    },
+    []
+  ); // SHIFT_CYCLE_VALUES is a constant from outer scope, so it's stable.
+  // exhaustive-deps might suggest adding SHIFT_CYCLE_VALUES here; it's good practice: [SHIFT_CYCLE_VALUES]
+
+  const generateCalendarData = useCallback(() => {
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth(); // 0-11
+
+    const firstDayOfMonth = new Date(year, month, 1).getDay(); // 0 (Нд) - 6 (Сб)
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+    const adjustedFirstDay = firstDayOfMonth === 0 ? 6 : firstDayOfMonth - 1;
+
+    let currentMonthTotalHours = 0;
+    let currentMonthDayHours = 0;
+    let currentMonthNightHours = 0;
+
+    const generatedCalendarRows: JSX.Element[] = [];
+    let date = 1;
+
+    for (let i = 0; i < 6; i++) {
+      // Макс 6 тижнів
+      const weekCells: JSX.Element[] = [];
+      for (let j = 0; j < 7; j++) {
+        // 7 днів на тиждень
+        if (i === 0 && j < adjustedFirstDay) {
+          weekCells.push(
+            <td key={`empty-${i}-${j}`} className="empty-cell"></td>
+          );
+        } else if (date > daysInMonth) {
+          weekCells.push(
+            <td key={`empty-${i}-${j}`} className="empty-cell"></td>
+          );
+        } else {
+          const cellDate = new Date(year, month, date);
+          const today = new Date();
+          const isToday =
+            date === today.getDate() &&
+            month === today.getMonth() &&
+            year === today.getFullYear();
+
+          let cellClassName = "";
+          let hoursTextForThisCell = "";
+          let hoursSpan = null;
+
+          let dayNumberStyle = {};
+          if (baseShiftInfo) {
+            const shiftTypeForCell = getShiftForDate(cellDate, baseShiftInfo);
+            const prevCalendarDay = new Date(year, month, date - 1);
+            const shiftTypeForPrevDay = getShiftForDate(
+              prevCalendarDay,
+              baseShiftInfo
+            );
+
+            // Highlight the base shift day if it's a day shift
+            if (
+              cellDate.getFullYear() === baseShiftInfo.year &&
+              cellDate.getMonth() === baseShiftInfo.month &&
+              cellDate.getDate() === baseShiftInfo.day &&
+              shiftTypeForCell === "D"
+            ) {
+              cellClassName = "day-shift highlight-day-shift";
+              dayNumberStyle = { fontWeight: 'bold', color: 'red' };
+            } else if (shiftTypeForCell === "D") {
+              cellClassName = "day-shift";
+            } else if (shiftTypeForCell === "N") {
+              cellClassName = "night-shift";
+            } else {
+              cellClassName = "off-day";
+            }
+
+            if (shiftTypeForCell === "D") {
+              hoursTextForThisCell = "+12";
+              currentMonthDayHours += 12;
+              currentMonthTotalHours += 12;
+            } else if (shiftTypeForCell === "N") {
+              hoursTextForThisCell = "+4";
+              currentMonthNightHours += 4;
+              currentMonthTotalHours += 4;
+            } else if (
+              (shiftTypeForCell === "O1" || shiftTypeForCell === "O2") &&
+              shiftTypeForPrevDay === "N"
+            ) {
+              hoursTextForThisCell = "+8";
+              currentMonthNightHours += 8;
+              currentMonthTotalHours += 8;
+            }
+
+            if (hoursTextForThisCell !== "") {
+              hoursSpan = (
+                <span className="hours-indicator">{hoursTextForThisCell}</span>
+              );
+            }
+          }
+
+          if (isToday) {
+            cellClassName += " today";
+          }
+
+          weekCells.push(
+            <td key={date} className={cellClassName}>
+              {hoursSpan}
+              <span className="day-number" style={dayNumberStyle}>{date}</span>
+            </td>
+          );
+          date++;
+        }
+      }
+      generatedCalendarRows.push(<tr key={i}>{weekCells}</tr>);
+      if (date > daysInMonth) break;
+    }
+
+    return {
+      rows: generatedCalendarRows,
+      totalH: currentMonthTotalHours,
+      dayH: currentMonthDayHours,
+      nightH: currentMonthNightHours,
+    };
+  }, [currentDate, baseShiftInfo, getShiftForDate]); // Corrected dependencies
+
+  const applyShift = () => {
+    const day = parseInt(baseDayInput);
+    const currentYearVal = currentDate.getFullYear();
+    const currentMonthVal = currentDate.getMonth();
+    const daysInCurrentMonth = new Date(
+      currentYearVal,
+      currentMonthVal + 1,
+      0
+    ).getDate();
+
+    if (isNaN(day) || day < 1 || day > daysInCurrentMonth) {
+      alert(
+        `Будь ласка, введіть коректний день місяця (1-${daysInCurrentMonth}) для ${UKRAINIAN_MONTH_NAMES[currentMonthVal]} ${currentYearVal}.`
+      );
+      return;
+    }
+    setBaseShiftInfo({
+      year: currentYearVal,
+      month: currentMonthVal,
+      day: day,
+    });
+  };
+
+  const clearShift = () => {
+    setBaseShiftInfo(null);
+    setBaseDayInput("");
+    setTotalHours(0);
+    setDayHours(0);
+    setNightHours(0);
+  };
+
+  const prevMonth = () => {
+    setCurrentDate((prevDate) => {
+      const newDate = new Date(prevDate);
+      newDate.setMonth(newDate.getMonth() - 1);
+      return newDate;
+    });
+  };
+
+  const nextMonth = () => {
+    setCurrentDate((prevDate) => {
+      const newDate = new Date(prevDate);
+      newDate.setMonth(newDate.getMonth() + 1);
+      return newDate;
+    });
+  };
+
+  useEffect(() => {
+    const { rows, totalH, dayH, nightH } = generateCalendarData();
+    setCalendarRows(rows);
+    setTotalHours(totalH);
+    setDayHours(dayH);
+    setNightHours(nightH);
+  }, [generateCalendarData]);
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+    <div className="container">
+      <h1>Календар ваших змін</h1>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+      <div className="controls">
+        <label htmlFor="base-day-input" className="control-main-label">
+          Вкажіть день поточного місяця, коли у вас ДЕННА зміна:
+        </label>
+        <input
+          type="number"
+          id="base-day-input"
+          min="1"
+          max="31"
+          className="control-day-input"
+          value={baseDayInput}
+          onChange={(e) => setBaseDayInput(e.target.value)}
+        />
+        <div className="control-buttons-wrapper">
+          <button id="apply-shift-button" onClick={applyShift}>
+            Застосувати графік
+          </button>
+          <button id="clear-shift-button" onClick={clearShift}>
+            Очистити графік
+          </button>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+      </div>
+
+      <div className="calendar-header">
+        <button id="prev-month-button" onClick={prevMonth}>
+          {"< Попередній"}
+        </button>
+        <h2 id="month-year-header">{`${
+          UKRAINIAN_MONTH_NAMES[currentDate.getMonth()]
+        } ${currentDate.getFullYear()}`}</h2>
+        <button id="next-month-button" onClick={nextMonth}>
+          {"Наступний >"}
+        </button>
+      </div>
+
+      <table id="calendar-table">
+        <thead>
+          <tr>
+            <th>Пн</th>
+            <th>Вт</th>
+            <th>Ср</th>
+            <th>Чт</th>
+            <th>Пт</th>
+            <th>Сб</th>
+            <th>Нд</th>
+          </tr>
+        </thead>
+        <tbody id="calendar-body">{calendarRows}</tbody>
+      </table>
+
+      <div className="legend">
+        <h3>Легенда:</h3>
+        <p>
+          <span className="legend-color day-shift-legend"></span> Денна зміна
+        </p>
+        <p>
+          <span className="legend-color night-shift-legend"></span> Нічна зміна
+        </p>
+        <p>
+          <span className="legend-color off-day-legend"></span> Вихідний день
+        </p>
+      </div>
+
+      <div className="hours-summary">
+        <h3>Підсумок годин за місяць:</h3>
+        <p>
+          Загальна кількість годин: <span id="total-hours">{totalHours}</span>
+        </p>
+        <p>
+          Денних годин: <span id="day-hours">{dayHours}</span>
+        </p>
+        <p>
+          Нічних годин: <span id="night-hours">{nightHours}</span>
+        </p>
+      </div>
     </div>
   );
-}
+};
+
+export default UkrainianCalendar;

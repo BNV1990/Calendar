@@ -1,26 +1,304 @@
-@import "tailwindcss";
-
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+    font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    margin: 0;
+    background-color: #eef2f7; /* Softer background */
+    padding: 20px;
+    box-sizing: border-box; /* Include padding in element's total width and height */
+}
+
+.container {
+    background-color: #ffffff;
+    padding: 30px; /* Increased padding */
+    border-radius: 12px; /* More rounded corners */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); /* Softer, larger shadow */
+    text-align: center;
+    width: 100%; /* Use full width on smaller screens */
+    max-width: 750px; /* Slightly increased max-width */
+    margin-top: 20px; /* Add margin top */
+}
+
+.controls {
+    margin-bottom: 30px; /* Increased bottom margin */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px; /* Increased gap */
+}
+
+/* Стиль для головного лейбла */
+.control-main-label {
+    color: red;
+    font-weight: bold;
+    font-size: 1.15em; /* Slightly larger font */
+    text-align: center;
+}
+
+/* Стиль для поля вводу дня */
+.control-day-input {
+    padding: 10px 15px; /* Adjusted padding */
+    border: 1px solid #dcdcdc; /* Lighter border */
+    border-radius: 6px; /* More rounded corners */
+    width: 80px; /* Adjusted width */
+    font-size: 1.1em; /* Adjusted font size */
+    text-align: center;
+    outline: none; /* Remove default outline */
+    transition: border-color 0.2s ease-in-out;
+}
+
+.control-day-input:focus {
+    border-color: #007bff; /* Highlight on focus */
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+/* Контейнер для кнопок */
+.control-buttons-wrapper {
+    display: flex;
+    gap: 15px; /* Increased gap */
+    justify-content: center;
+    flex-wrap: wrap; /* Allow buttons to wrap on smaller screens */
+}
+
+/* Стилі для кнопок в .control-buttons-wrapper */
+.control-buttons-wrapper button {
+    padding: 10px 20px; /* Adjusted padding */
+    color: white;
+    border: none;
+    border-radius: 6px; /* More rounded corners */
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    font-size: 1em;
+    font-weight: 500;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+}
+
+#apply-shift-button {
+    background-color: #007bff; /* Primary blue */
+}
+
+#apply-shift-button:hover {
+    background-color: #0056b3;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+#clear-shift-button {
+    background-color: #6c757d; /* Secondary grey */
+}
+
+#clear-shift-button:hover {
+    background-color: #5a6268;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.controls label[for="base-day-input"] {
+    color: red;
+    font-weight: bold;
+    margin-right: 0; /* Remove margin */
+}
+
+
+
+
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px; /* Increased bottom margin */
+    padding: 0 10px; /* Add horizontal padding */
+}
+
+.calendar-header button {
+    padding: 8px 15px; /* Adjusted padding */
+    background-color: #e9ecef; /* Light grey background */
+    color: #495057; /* Dark grey text */
+    border: 1px solid #ced4da; /* Light border */
+    border-radius: 6px; /* More rounded corners */
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+    font-size: 1em;
+    font-weight: 500;
+}
+
+.calendar-header button:hover {
+    background-color: #ced4da;
+    border-color: #adb5bd;
+}
+
+#month-year-header {
+    font-size: 1.6em; /* Slightly larger font */
+    font-weight: 600;
+    color: #333;
+    margin: 0 20px; /* Increased horizontal margin */
+    min-width: 200px; /* Ensure space for month name */
+    text-align: center;
+}
+
+#calendar-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px; /* Add bottom margin */
+}
+
+#calendar-table th, #calendar-table td {
+    border: 1px solid #e0e0e0; /* Lighter border */
+    padding: 12px 5px; /* Adjusted padding */
+    text-align: center;
+    height: 50px; /* Increased cell height */
+    width: calc(100% / 7);
+    font-size: 0.9em; /* Slightly smaller font for cell content */
+    position: relative; /* For absolute positioning of hours */
+}
+
+#calendar-table th {
+    background-color: #f8f9fa; /* Lighter header background */
+    font-weight: 600;
+    color: #555;
+    text-transform: uppercase; /* Uppercase day names */
+    font-size: 0.8em;
+    padding: 10px 5px;
+}
+
+#calendar-table td {
+    cursor: default;
+    transition: background-color 0.2s ease-in-out;
+}
+
+/* Класи для змін */
+.day-shift {
+    background-color: #d4edda; /* Muted green */
+    color: #155724; /* Dark green text */
+}
+
+.night-shift {
+    background-color: #d1ecf1; /* Muted blue */
+    color: #0c5460; /* Dark blue text */
+}
+
+.off-day {
+     background-color: #f8f9fa; /* Light background for off days */
+}
+
+.off-day .day-number {
+    color: #6c757d; /* Muted grey for off day numbers */
+}
+
+
+.empty-cell {
+    background-color: #fefefe; /* Very light background for empty cells */
+}
+
+.today {
+    font-weight: bold;
+    border: 2px solid #007bff; /* Primary blue border */
+    background-color: #e9f5ff; /* Very light blue background for today */
+}
+
+.legend {
+    margin-top: 30px; /* Increased top margin */
+    padding-top: 20px; /* Increased top padding */
+    border-top: 1px solid #e0e0e0; /* Lighter border */
+    text-align: left;
+}
+
+.legend h3 {
+    margin-top: 0;
+    margin-bottom: 15px; /* Increased bottom margin */
+    font-size: 1.2em; /* Slightly larger font */
+    color: #333;
+}
+
+.legend p {
+    margin: 8px 0; /* Adjusted margin */
+    display: flex;
+    align-items: center;
+    font-size: 1em;
+    color: #555;
+}
+
+.legend-color {
+    display: inline-block;
+    width: 25px; /* Slightly larger color swatch */
+    height: 25px; /* Slightly larger color swatch */
+    margin-right: 12px; /* Increased margin */
+    border-radius: 4px; /* Rounded corners for swatch */
+    border: 1px solid #dcdcdc; /* Lighter border */
+    vertical-align: middle;
+}
+
+.day-shift-legend {
+    background-color: #d4edda; /* Muted green */
+}
+
+.night-shift-legend {
+    background-color: #d1ecf1; /* Muted blue */
+}
+
+.off-day-legend {
+    background-color: #f8f9fa; /* Light background */
+}
+
+/* Remove unused style */
+.off-day-text-legend {
+    display: none;
+}
+
+/* Styles for the hours indicator */
+.hours-indicator {
+    position: absolute;
+    top: 4px; /* Adjusted position */
+    right: 4px; /* Adjusted position */
+    font-size: 0.7em; /* Slightly smaller font */
+    color: #28a745; /* Bootstrap success green */
+    background-color: rgba(255, 255, 255, 0.8); /* More opaque background */
+    padding: 2px 4px; /* Adjusted padding */
+    border-radius: 4px; /* More rounded corners */
+    line-height: 1;
+    z-index: 1;
+    font-weight: bold;
+}
+
+/* Ensure day number is visible */
+.day-number {
+    position: relative;
+    z-index: 0;
+    font-size: 1.2em; /* Larger day number */
+    color: #333;
+}
+
+.off-day .day-number {
+    color: #6c757d; /* Muted grey for off day numbers */
+}
+
+.hours-summary {
+    margin-top: 30px; /* Increased top margin */
+    padding-top: 20px; /* Increased top padding */
+    border-top: 1px solid #e0e0e0; /* Lighter border */
+    text-align: left;
+    color: #333;
+}
+
+.hours-summary h3 {
+    margin-top: 0;
+    margin-bottom: 15px; /* Increased bottom margin */
+    font-size: 1.2em;
+    color: #333;
+}
+
+.hours-summary p {
+    margin: 8px 0;
+    font-size: 1em;
+    color: #555;
+}
+
+.hours-summary span {
+    font-weight: bold;
+    color: #007bff; /* Primary blue for emphasis */
+}
+
+td.highlight-day-shift span.day-number {
+    font-weight: bold;
+    color: red;
 }
