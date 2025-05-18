@@ -366,4 +366,8 @@ td.highlight-day-shift span.day-number {
   .hours-summary {
     margin: 0; /* Remove auto margins on mobile to allow left alignment */
   }
+
+  .container h1 {
+    font-size: 1.8em; /* Smaller font size for main header on mobile */
+  }
 }
