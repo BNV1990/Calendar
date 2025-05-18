@@ -347,6 +347,11 @@ td.highlight-day-shift span.day-number {
   .calendar-header button {
     padding: 4px 8px; /* Further reduced button padding */
     font-size: 0.9em; /* Smaller font for buttons */
+    padding: 4px; /* Adjusted padding to center icon */
+  }
+
+  .calendar-header button .button-text {
+    display: none; /* Hide button text on mobile */
   }
 
   .calendar-table-container {
@@ -356,5 +361,9 @@ td.highlight-day-shift span.day-number {
 
   .hours-summary h3 {
     text-align: left; /* Align hours summary header to the left on mobile */
+  }
+
+  .hours-summary {
+    margin: 0; /* Remove auto margins on mobile to allow left alignment */
   }
 }

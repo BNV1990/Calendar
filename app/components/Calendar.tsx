@@ -20,13 +20,13 @@ const Calendar: React.FC<CalendarProps> = ({
     <>
       <div className="calendar-header">
         <button id="prev-month-button" onClick={prevMonth}>
-          <FaCaretLeft /> {"Попередній"}
+          <FaCaretLeft /> <span className="button-text">Попередній</span>
         </button>
         <h2 id="month-year-header">{`${
           monthNames[currentDate.getMonth()]
         } ${currentDate.getFullYear()}`}</h2>
         <button id="next-month-button" onClick={nextMonth}>
-          {"Наступний"} <FaCaretRight />
+          <span className="button-text">Наступний</span> <FaCaretRight />
         </button>
       </div>
 
