@@ -283,6 +283,7 @@ body {
   border-top: none; /* Lighter border */
   text-align: left;
   color: #333;
+  margin: 0 auto; /* Center the block horizontally */
 }
 
 .hours-summary h3 {
@@ -311,9 +312,9 @@ body {
 }
 
 .legend-and-summary-container {
-  display: flex;
-  justify-content: flex-start; /* Adjust as needed */
-  align-items: flex-start; /* Align items to the top */
+  display: grid; /* Use grid layout */
+  grid-template-columns: auto 1fr; /* Two columns: auto for legend, 1fr for summary */
+  align-items: start; /* Align items to the start of the grid cell */
   margin-top: 30px;
   padding-top: 20px;
   border-top: 1px solid #e0e0e0;
