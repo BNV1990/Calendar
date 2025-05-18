@@ -2,7 +2,6 @@ const CACHE_NAME = 'calendar-cache-v1';
 const urlsToCache = [
   '/',
   '/globals.css',
-  '/favicon.ico',
   '/next.svg',
   '/vercel.svg',
   '/icons/logo.png'
