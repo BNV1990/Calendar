@@ -370,4 +370,8 @@ td.highlight-day-shift span.day-number {
   .container h1 {
     font-size: 1.8em; /* Smaller font size for main header on mobile */
   }
+
+  .control-buttons-wrapper button {
+    font-size: 0.9em; /* Smaller font size for control buttons on mobile */
+  }
 }
