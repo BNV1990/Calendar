@@ -22,6 +22,12 @@ body {
   margin-top: 20px; /* Add margin top */
 }
 
+@media (max-width: 768px) {
+  .container {
+    padding: 10px; /* Reduced padding for mobile */
+  }
+}
+
 .controls {
   margin-bottom: 30px; /* Increased bottom margin */
   display: flex;
@@ -123,7 +129,8 @@ body {
   border: 1px solid #dcdcdc; /* Match input border */
   border-radius: 6px; /* Match input border radius */
   cursor: pointer;
-  transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out,
+    box-shadow 0.2s ease-in-out;
   font-size: 1.5em; /* Adjust icon size */
   display: flex;
   align-items: center;
