@@ -1,8 +1,5 @@
-import React from 'react';
+import React, { useState, useRef, useEffect } from "react";
 import { FaCaretLeft, FaCaretRight } from "react-icons/fa";
-import { Swiper, SwiperSlide } from 'swiper/react';
-import 'swiper/swiper-bundle.css'; // Import Swiper styles
-import SwiperCore from 'swiper';
 
 interface CalendarProps {
   calendarRows: React.JSX.Element[];
@@ -12,6 +9,8 @@ interface CalendarProps {
   nextMonth: () => void;
 }
 
+type AnimationDirection = 'none' | 'left' | 'right';
+
 const Calendar: React.FC<CalendarProps> = ({
   calendarRows,
   currentDate,
@@ -19,17 +18,51 @@ const Calendar: React.FC<CalendarProps> = ({
   prevMonth,
   nextMonth,
 }) => {
+  const [touchStartX, setTouchStartX] = useState(0);
+  const [touchEndX, setTouchEndX] = useState(0);
+  const [animationDirection, setAnimationDirection] = useState<AnimationDirection>('none');
+  const calendarRef = useRef<HTMLDivElement>(null);
 
-  const handleSlideChange = (swiper: SwiperCore) => {
-    if (swiper.activeIndex > swiper.previousIndex) {
-      nextMonth();
-    } else {
-      prevMonth();
-    }
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchStartX(e.targetTouches[0].clientX);
   };
 
+  const handleTouchMove = (e: React.TouchEvent) => {
+    setTouchEndX(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchEnd = () => {
+    const threshold = 50; // Minimum swipe distance
+    const distance = touchStartX - touchEndX;
+
+    if (distance > threshold) {
+      setAnimationDirection('left');
+      nextMonth();
+    } else if (distance < -threshold) {
+      setAnimationDirection('right');
+      prevMonth();
+    }
+    setTouchStartX(0);
+    setTouchEndX(0);
+  };
+
+  useEffect(() => {
+    if (animationDirection !== 'none') {
+      const handler = setTimeout(() => {
+        setAnimationDirection('none');
+      }, 300); // Match this duration with your CSS animation duration
+      return () => clearTimeout(handler);
+    }
+  }, [animationDirection]);
+
   return (
-    <>
+    <div
+      className={`calendar-container ${animationDirection}`}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+      ref={calendarRef}
+    >
       <div className="calendar-header">
         <div className="month-navigation">
           <button id="prev-month-button" onClick={prevMonth}>
@@ -44,32 +77,23 @@ const Calendar: React.FC<CalendarProps> = ({
         </div>
       </div>
 
-      <Swiper
-        spaceBetween={0}
-        slidesPerView={1}
-        onSlideChange={handleSlideChange}
-        allowTouchMove={true} // Enable touch swipe
-      >
-        <SwiperSlide>
-          <div className="calendar-table-container">
-            <table id="calendar-table">
-              <thead>
-                <tr>
-                  <th>Пн</th>
-                  <th>Вт</th>
-                  <th>Ср</th>
-                  <th>Чт</th>
-                  <th>Пт</th>
-                  <th>Сб</th>
-                  <th>Нд</th>
-                </tr>
-              </thead>
-              <tbody id="calendar-body">{calendarRows}</tbody>
-            </table>
-          </div>
-        </SwiperSlide>
-      </Swiper>
-    </>
+      <div className="calendar-table-container">
+        <table id="calendar-table">
+          <thead>
+            <tr>
+              <th>Пн</th>
+              <th>Вт</th>
+              <th>Ср</th>
+              <th>Чт</th>
+              <th>Пт</th>
+              <th>Сб</th>
+              <th>Нд</th>
+            </tr>
+          </thead>
+          <tbody id="calendar-body">{calendarRows}</tbody>
+        </table>
+      </div>
+    </div>
   );
 };
 

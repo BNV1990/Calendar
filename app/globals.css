@@ -225,67 +225,6 @@ body {
   text-align: left;
 }
 
-/* Animations for swipe effect */
-@keyframes slide-in-left {
-  from {
-    transform: translateX(100%);
-    opacity: 0;
-  }
-  to {
-    transform: translateX(0);
-    opacity: 1;
-  }
-}
-
-@keyframes slide-in-right {
-  from {
-    transform: translateX(-100%);
-    opacity: 0;
-  }
-  to {
-    transform: translateX(0);
-    opacity: 1;
-  }
-}
-
-@keyframes slide-out-left {
-  from {
-    transform: translateX(0);
-    opacity: 1;
-  }
-  to {
-    transform: translateX(-100%);
-    opacity: 0;
-  }
-}
-
-@keyframes slide-out-right {
-  from {
-    transform: translateX(0);
-    opacity: 1;
-  }
-  to {
-    transform: translateX(100%);
-    opacity: 0;
-  }
-}
-
-.slide-in-left {
-  animation: slide-in-left 0.5s ease-out;
-}
-
-.slide-in-right {
-  animation: slide-in-right 0.5s ease-out;
-}
-
-.slide-out-left {
-  animation: slide-out-left 0.5s ease-out;
-}
-
-.slide-out-right {
-  animation: slide-out-right 0.5s ease-out;
-}
-
 /* Keyframes for the jump animation */
 @keyframes jump {
   0% {
@@ -660,4 +599,62 @@ td.highlight-day-shift span.day-number {
 
 .instruction-text {
   text-align: left;
+}
+
+/* Calendar animation styles */
+.calendar-container {
+  position: relative;
+  overflow: hidden; /* Hide overflowing content during animation */
+}
+
+.calendar-container.left .calendar-table-container {
+  animation: slideOutLeft 0.3s ease-in-out forwards;
+}
+
+.calendar-container.right .calendar-table-container {
+  animation: slideOutRight 0.3s ease-in-out forwards;
+}
+
+@keyframes slideInLeft {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOutLeft {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOutRight {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(100%);
+    opacity: 0;
+  }
 }
