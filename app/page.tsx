@@ -4,6 +4,7 @@ import React, { useEffect, useState, useCallback } from "react";
 import Legend from "./components/Legend";
 import MonthlySummary from "./components/MonthlySummary";
 import Calendar from "./components/Calendar";
+import AutorenewIcon from "./components/AutorenewIcon";
 
 interface ShiftInfo {
   year: number;
@@ -36,7 +37,9 @@ const UkrainianCalendar = () => {
     day: 1,
   };
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [baseShiftInfo, setBaseShiftInfo] = useState<ShiftInfo | null>(initialBaseShiftInfo); // Initial state for 1st day
+  const [baseShiftInfo, setBaseShiftInfo] = useState<ShiftInfo | null>(
+    initialBaseShiftInfo
+  ); // Initial state for 1st day
   const [baseDayInput, setBaseDayInput] = useState("1"); // Initial value is "1"
   const [calendarRows, setCalendarRows] = useState<React.JSX.Element[]>([]);
 
@@ -306,39 +309,34 @@ const UkrainianCalendar = () => {
 
   return (
     <div className="container">
-      <h1>Календар ваших змін</h1>
+      <h1>Календар робочих змін</h1>
 
       <div className="controls">
-        <label htmlFor="base-day-input" className="control-main-label">
-          Вкажіть день поточного місяця, коли у вас ДЕННА зміна:
-        </label>
-        <div className="day-input-wrapper">
+        <div className="input-and-clear-wrapper">
           {" "}
-          {/* Wrapper for input and buttons */}
-          <button onClick={decrementDay} className="day-control-button">
-            -
-          </button>
-          <input
-            type="number"
-            id="base-day-input"
-            min="1"
-            max="31"
-            className="control-day-input"
-            value={baseDayInput}
-            onChange={(e) => setBaseDayInput(e.target.value)}
-          />
-          <button onClick={incrementDay} className="day-control-button">
-            +
-          </button>
-        </div>
-        <div className="control-buttons-wrapper">
-          <button id="apply-shift-button" onClick={applyShift}>
-            Застосувати графік
-          </button>
-          <button id="clear-shift-button" onClick={clearShift}>
-            Очистити графік
-          </button>
-        </div>
+          {/* New wrapper */}
+          <div className="day-input-wrapper">
+            {" "}
+            {/* Wrapper for input and buttons */}
+            <button onClick={decrementDay} className="day-control-button">
+              -
+            </button>
+            <input
+              type="number"
+              id="base-day-input"
+              min="1"
+              max="31"
+              className="control-day-input"
+              value={baseDayInput}
+              onChange={(e) => setBaseDayInput(e.target.value)}
+            />
+            <button onClick={incrementDay} className="day-control-button">
+              +
+            </button>
+          </div>
+          <AutorenewIcon onClick={clearShift} />
+        </div>{" "}
+        {/* End of new wrapper */}
       </div>
 
       <Calendar

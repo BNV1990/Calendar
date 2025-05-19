@@ -25,7 +25,7 @@ body {
 .controls {
   margin-bottom: 30px; /* Increased bottom margin */
   display: flex;
-  flex-direction: column;
+  flex-direction: column; /* Revert to column */
   align-items: center;
   gap: 20px; /* Increased gap */
 }
@@ -102,29 +102,43 @@ body {
 
 .calendar-header {
   display: flex;
-  justify-content: space-between;
+  justify-content: center; /* Center the month navigation block */
   align-items: center;
   margin-bottom: 20px; /* Increased bottom margin */
   padding: 0 10px; /* Add horizontal padding */
 }
 
-.calendar-header button {
-  padding: 8px 15px; /* Adjusted padding */
-  background-color: #e9ecef; /* Light grey background */
-  color: #495057; /* Dark grey text */
-  border: 1px solid #ced4da; /* Light border */
-  border-radius: 6px; /* More rounded corners */
-  cursor: pointer;
-  transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out;
-  font-size: 1em;
-  font-weight: 500;
+.month-navigation {
   display: flex;
   align-items: center;
+  gap: 10px; /* Space between buttons and title */
+}
+
+.calendar-header button {
+  width: 40px; /* Make it square */
+  height: 40px; /* Make it square */
+  padding: 0; /* Remove padding */
+  background-color: #ffffff; /* White background */
+  color: #555; /* Dark grey text for icon */
+  border: 1px solid #dcdcdc; /* Match input border */
+  border-radius: 6px; /* Match input border radius */
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  font-size: 1.5em; /* Adjust icon size */
+  display: flex;
+  align-items: center;
+  justify-content: center; /* Center icon */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05); /* Match input wrapper shadow */
 }
 
 .calendar-header button:hover {
-  background-color: #ced4da;
-  border-color: #adb5bd;
+  background-color: #f0f0f0; /* Light grey background on hover */
+  border-color: #ced4da;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow on hover */
+}
+
+.calendar-header button .button-text {
+  display: none; /* Hide button text */
 }
 
 #month-year-header {
@@ -455,4 +469,64 @@ td.highlight-day-shift span.day-number {
 .day-control-button:last-child {
   border-top-right-radius: 6px;
   border-bottom-right-radius: 6px;
+}
+
+/* Styles for the clear button icon */
+.clear-button-icon {
+  background-color: #fff; /* White background */
+  border: 1px solid #dcdcdc; /* Match input border */
+  border-radius: 6px; /* Match input border radius */
+  color: #333; /* Dark grey color for icon */
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out,
+    box-shadow 0.2s ease-in-out;
+  margin-left: 10px; /* Add margin to the left */
+  height: 40px; /* Match day control button height */
+  width: 40px; /* Make it square */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05); /* Match input wrapper shadow */
+  font-size: 1.5em; /* Adjust icon size */
+}
+
+.clear-button-icon svg {
+  fill: #fff; /* Explicitly set icon fill color to white */
+  width: 100%; /* Make the SVG fill the container width */
+  height: 100%; /* Make the SVG fill the container height */
+}
+
+.clear-button-icon svg path {
+  fill: #6c757d; /* Set the fill color of the icon paths to light grey */
+}
+
+.clear-button-icon:hover {
+  background-color: #f0f0f0; /* Slightly darker on hover */
+  border-color: #ced4da;
+}
+
+/* Adjust day input wrapper to align items */
+.day-input-wrapper {
+  display: flex;
+  align-items: center;
+  border: 1px solid #dcdcdc; /* Match input border */
+  border-radius: 6px; /* Match input border radius */
+  overflow: hidden; /* Hide overflow from rounded corners */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05); /* Subtle shadow */
+}
+
+/* Styles for the input and clear button wrapper */
+.input-and-clear-wrapper {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px; /* Adjust gap between input wrapper and clear button */
+}
+
+.autorenew-icon svg {
+  transition: transform 0.3s ease-in-out; /* Add transition for smooth rotation to the SVG */
+}
+
+.autorenew-icon:hover svg {
+  transform: rotate(90deg); /* Rotate the SVG 90 degrees clockwise on hover */
 }
