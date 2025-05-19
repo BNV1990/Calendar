@@ -52,4 +52,21 @@ const Calendar: React.FC<CalendarProps> = ({
   );
 };
 
+/* Стилі для мобільних пристроїв */
+const styles = `
+@media (max-width: 768px) {
+  .calendar-table-container {
+    width: 95%;
+    margin: 0 auto;
+  }
+}
+`;
+
 export default Calendar;
+
+/* Додаємо стилі до компонента */
+if (typeof document !== 'undefined') {
+  const styleElement = document.createElement('style');
+  styleElement.innerHTML = styles;
+  document.head.appendChild(styleElement);
+}
