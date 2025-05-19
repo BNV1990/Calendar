@@ -17,6 +17,7 @@ const Calendar: React.FC<CalendarProps> = ({
   nextMonth,
 }) => {
   const [touchStartX, setTouchStartX] = useState(0);
+  const [animationClass, setAnimationClass] = useState('');
 
   const handleTouchStart = (e: React.TouchEvent) => {
     setTouchStartX(e.touches[0].clientX);
@@ -33,10 +34,22 @@ const Calendar: React.FC<CalendarProps> = ({
     const swipeThreshold = 50; // Minimum distance for a swipe
 
     if (swipeDistance > swipeThreshold) {
-      prevMonth();
+      setAnimationClass('slide-out-right');
+      setTimeout(() => {
+        prevMonth();
+        setAnimationClass('slide-in-left');
+      }, 500); // Match animation duration
     } else if (swipeDistance < -swipeThreshold) {
-      nextMonth();
+      setAnimationClass('slide-out-left');
+      setTimeout(() => {
+        nextMonth();
+        setAnimationClass('slide-in-right');
+      }, 500); // Match animation duration
     }
+  };
+
+  const handleAnimationEnd = () => {
+    setAnimationClass('');
   };
 
   return (
@@ -56,10 +69,11 @@ const Calendar: React.FC<CalendarProps> = ({
       </div>
 
       <div
-        className="calendar-table-container"
+        className={`calendar-table-container ${animationClass}`}
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
+        onAnimationEnd={handleAnimationEnd}
       >
         <table id="calendar-table">
           <thead>
