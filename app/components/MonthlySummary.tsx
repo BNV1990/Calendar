@@ -1,13 +1,23 @@
 import React from 'react';
 
-const MonthlySummary = () => {
+interface MonthlySummaryProps {
+  totalHours: number;
+  dayHours: number;
+  nightHours: number;
+}
+
+const MonthlySummary: React.FC<MonthlySummaryProps> = ({
+  totalHours,
+  dayHours,
+  nightHours,
+}) => {
   return (
     <div className="hours-summary" style={{ marginBottom: '20px' }}>
       <h2>Підсумок годин за місяць:</h2>
       <div>
-        <p>Загальна кількість годин:<span>192</span></p>
-        <p>Денних годин:<span>96</span></p>
-        <p>Нічних годин:<span>96</span></p>
+        <p>Загальна кількість годин:<span>{totalHours}</span></p>
+        <p>Денних годин:<span>{dayHours}</span></p>
+        <p>Нічних годин:<span>{nightHours}</span></p>
       </div>
     </div>
   );
