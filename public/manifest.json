@@ -3,17 +3,17 @@
   "name": "Simple Calendar App",
   "icons": [
     {
-      "src": "/icons/logo.png",
+      "src": "/icons/icon.png",
       "type": "image/png",
       "sizes": "799x799"
     },
     {
-      "src": "/icons/logo.png",
+      "src": "/icons/icon.png",
       "type": "image/png",
       "sizes": "192x192"
     },
     {
-      "src": "/icons/logo.png",
+      "src": "/icons/icon.png",
       "type": "image/png",
       "sizes": "512x512"
     }
