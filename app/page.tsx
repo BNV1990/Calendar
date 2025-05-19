@@ -571,11 +571,7 @@ const UkrainianCalendar = () => {
         </p>
 
         <div className="legend-and-summary-container" style={{ marginTop: '10px' }}>
-          <Legend
-            totalHours={totalHours}
-            dayHours={dayHours}
-            nightHours={nightHours}
-          />
+          <Legend />
           <MonthlySummary />
         </div>
       </div>

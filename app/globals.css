@@ -364,6 +364,15 @@ body {
   text-align: left;
   color: #333;
   margin: 0 auto; /* Center the block horizontally */
+  text-align: left; /* Align text to the left */
+}
+
+.hours-summary h2 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  font-size: 1.2em;
+  color: #333;
+  text-align: left; /* Ensure title is left-aligned */
 }
 
 .hours-summary .accordion-header {
@@ -390,9 +399,12 @@ body {
 }
 
 .hours-summary span {
-  font-weight: bold;
-  color: #007bff; /* Primary blue for emphasis */
+  font-weight: bold; /* Make numbers bold */
+  color: #000; /* Change color to black for better contrast */
   vertical-align: middle; /* Align text vertically */
+  text-align: right; /* Align numbers to the right */
+  display: inline-block; /* Ensure span behaves as a block for text-align */
+  min-width: 50px; /* Give the span a minimum width to help with alignment */
 }
 
 .legend-and-summary-container {
@@ -502,6 +514,11 @@ td.highlight-day-shift span.day-number {
 
 .monthly-summary-content.mobile-view {
   display: none; /* Hide mobile hours summary by default */
+}
+
+/* Hide mobile summary on desktop */
+.monthly-summary-content.mobile-view {
+  display: none;
 }
 
 @media (max-width: 768px) {

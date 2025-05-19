@@ -1,17 +1,9 @@
 import React, { useState } from "react";
 import { FaChevronDown } from "react-icons/fa"; // Import an arrow icon
 
-interface LegendProps {
-  totalHours: number;
-  dayHours: number;
-  nightHours: number;
-}
+interface LegendProps {}
 
-const Legend: React.FC<LegendProps> = ({
-  totalHours,
-  dayHours,
-  nightHours,
-}) => {
+const Legend: React.FC<LegendProps> = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   const toggleAccordion = () => {
@@ -22,7 +14,6 @@ const Legend: React.FC<LegendProps> = ({
     <div className="legend accordion no-accordion-mobile">
       <h3 className="accordion-header" onClick={toggleAccordion}>
         Пояснення кольорів:
-        <span style={{ marginLeft: '50px' }}>Підсумок годин за місяць:</span>
         <span className={`accordion-icon ${isOpen ? "rotate" : ""}`}>
           <FaChevronDown />
         </span>
@@ -40,18 +31,6 @@ const Legend: React.FC<LegendProps> = ({
             </p>
             <p>
               <span className="legend-color off-day-legend"></span> Вихідний день
-            </p>
-          </div>
-          {/* Monthly Summary Desktop */}
-          <div className="monthly-summary-content desktop-view">
-            <p>
-              Загальна кількість годин: <span id="total-hours">{totalHours}</span>
-            </p>
-            <p>
-              Денних годин: <span id="day-hours">{dayHours}</span>
-            </p>
-            <p>
-              Нічних годин: <span id="night-hours">{nightHours}</span>
             </p>
           </div>
         </div>
