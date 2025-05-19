@@ -1,9 +1,7 @@
 import React, { useState } from "react";
 import { FaChevronDown } from "react-icons/fa"; // Import an arrow icon
 
-interface LegendProps {}
-
-const Legend: React.FC<LegendProps> = () => {
+const Legend = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   const toggleAccordion = () => {

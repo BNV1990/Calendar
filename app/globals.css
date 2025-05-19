@@ -546,6 +546,11 @@ td.highlight-day-shift span.day-number {
     margin-right: 5px; /* Reduced margin */
   }
 
+  /* Hide hours summary on mobile */
+  .hours-summary {
+    display: none;
+  }
+
   /* Hours summary mobile/desktop visibility */
   .monthly-summary-content.desktop-view {
     display: none; /* Hide desktop hours summary on mobile */
