@@ -57,8 +57,9 @@ body {
 }
 
 .control-day-input:focus {
-  border-color: #007bff; /* Highlight on focus */
-  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+  outline: none; /* Remove default outline */
+  box-shadow: none; /* Remove box shadow on focus */
+  border-color: #dcdcdc; /* Keep the default border color on focus */
 }
 
 /* Контейнер для кнопок */
