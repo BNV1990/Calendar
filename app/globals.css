@@ -889,6 +889,11 @@ td.highlight-day-shift span.day-number {
     max-height: 500px; /* Adjust based on expected content height */
   }
 
+  /* Hide legend title on mobile */
+  .legend h3 {
+    display: none;
+  }
+
   .legend h3 {
     margin-bottom: 0; /* Remove bottom margin from headers in mobile accordion */
   }
