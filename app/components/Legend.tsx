@@ -1,9 +1,9 @@
-import React from 'react';
+import React from "react";
 
 const Legend: React.FC = () => {
   return (
     <div className="legend">
-      <h3>Легенда:</h3>
+      <h3>Пояснення кольорів:</h3>
       <p>
         <span className="legend-color day-shift-legend"></span> Денна зміна
       </p>

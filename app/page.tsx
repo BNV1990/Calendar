@@ -347,6 +347,8 @@ const UkrainianCalendar = () => {
         nextMonth={nextMonth}
       />
 
+      <p className="instruction-text">* Виберіть будь-який день поточного місяця, коли у вас "ДЕННА" зміна!</p>
+
       <div className="legend-and-summary-container">
         <Legend />
 
