@@ -325,7 +325,7 @@ const UkrainianCalendar = () => {
               max="31"
               className="control-day-input"
               value={baseDayInput}
-              onChange={(e) => setBaseDayInput(e.target.value)}
+              readOnly
             />
             <button onClick={incrementDay} className="day-control-button">
               +
