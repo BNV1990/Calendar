@@ -138,23 +138,25 @@ const UkrainianCalendar = () => {
           let hoursSpan = null;
 
           let dayNumberStyle = {};
+          let shiftTypeForCell = null;
+          let shiftTypeForPrevDay = null;
+
           if (baseShiftInfo) {
-            const shiftTypeForCell = getShiftForDate(cellDate, baseShiftInfo);
+            shiftTypeForCell = getShiftForDate(cellDate, baseShiftInfo);
             const prevCalendarDay = new Date(year, month, date - 1);
-            const shiftTypeForPrevDay = getShiftForDate(
+            shiftTypeForPrevDay = getShiftForDate(
               prevCalendarDay,
               baseShiftInfo
             );
 
-            // Highlight the base shift day if it's a day shift
+            // Highlight the base shift day or the calculated first day shift in the current month
             if (
-              baseShiftInfo && // Added null check
-              cellDate.getFullYear() === baseShiftInfo.year &&
+              (cellDate.getFullYear() === baseShiftInfo.year &&
               cellDate.getMonth() === baseShiftInfo.month &&
-              cellDate.getDate() === baseShiftInfo.day &&
-              shiftTypeForCell === "D"
+              cellDate.getDate() === baseShiftInfo.day) ||
+              (date === 1 && shiftTypeForCell === "D") // Highlight the 1st day if it's a Day shift in the current month
             ) {
-              cellClassName = "day-shift highlight-day-shift";
+              cellClassName = "day-shift highlight-day-shift"; // Assuming the highlighted day is always a day shift
               dayNumberStyle = { fontWeight: "bold", color: "red" };
             } else if (shiftTypeForCell === "D") {
               cellClassName = "day-shift";
@@ -186,7 +188,14 @@ const UkrainianCalendar = () => {
                 <span className="hours-indicator">{hoursTextForThisCell}</span>
               );
             }
+          } else {
+            // If no base shift is set, highlight the 1st day of the current month
+            if (date === 1) {
+              dayNumberStyle = { fontWeight: "bold", color: "red" };
+            }
+            cellClassName = "off-day"; // Default to off-day if no base shift is set
           }
+
 
           if (isToday) {
             cellClassName += " today";

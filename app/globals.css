@@ -654,7 +654,66 @@ td.highlight-day-shift span.day-number {
     opacity: 1;
   }
   to {
-    transform: translateX(100%);
-    opacity: 0;
+  transform: translateX(100%);
+  opacity: 0;
+}
+}
+
+/* Accordion styles (default: always open) */
+.accordion-header {
+  cursor: pointer;
+  display: flex; /* Use flexbox to align header and icon */
+  justify-content: space-between; /* Space out header text and icon */
+  align-items: center; /* Vertically align items */
+}
+
+.accordion-icon {
+  margin-left: 10px; /* Space between header text and icon */
+  display: none; /* Hide icon by default on larger screens */
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s ease-in-out; /* Smooth rotation transition */
+}
+
+.accordion-icon.rotate {
+  transform: rotate(180deg); /* Rotate icon when open */
+}
+
+/* Style for the icon in the hours summary accordion */
+.hours-summary .accordion-icon svg {
+  fill: #000; /* Set icon color to black */
+}
+
+.accordion-content {
+  /* Content is visible by default on larger screens */
+  max-height: none;
+  overflow: visible;
+}
+
+/* Mobile-specific accordion styles */
+@media (max-width: 768px) {
+  .accordion-header {
+    border-bottom: 1px solid #e0e0e0; /* Add a border below the header */
+    padding-bottom: 10px; /* Add some space below the header */
+    margin-bottom: 10px; /* Add some space below the header */
+  }
+
+  .accordion-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out;
+  }
+
+  .accordion-content.open {
+    max-height: 500px; /* Adjust based on expected content height */
+  }
+
+  .legend h3,
+  .hours-summary h3 {
+    margin-bottom: 0; /* Remove bottom margin from headers in mobile accordion */
+  }
+
+  .accordion-icon {
+    display: flex; /* Show icon on mobile */
   }
 }
