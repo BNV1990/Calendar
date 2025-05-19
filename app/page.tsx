@@ -207,8 +207,7 @@ const UkrainianCalendar = () => {
     }
   }, []);
 
-  const applyShift = () => {
-    const day = parseInt(baseDayInput);
+  const applyShift = (day: number) => {
     const today = new Date(); // Get current date
     const currentYearVal = today.getFullYear(); // Use current year
     const currentMonthVal = today.getMonth(); // Use current month
@@ -251,21 +250,25 @@ const UkrainianCalendar = () => {
       0
     ).getDate();
     if (!isNaN(day) && day < daysInCurrentMonth) {
-      setBaseDayInput((day + 1).toString());
+      const newDay = day + 1;
+      setBaseDayInput(newDay.toString());
+      applyShift(newDay); // Added direct call with new day
     } else if (isNaN(day)) {
       setBaseDayInput("1");
+      applyShift(1); // Added direct call with new day
     }
-    applyShift(); // Added direct call
   };
 
   const decrementDay = () => {
     const day = parseInt(baseDayInput);
     if (!isNaN(day) && day > 1) {
-      setBaseDayInput((day - 1).toString());
+      const newDay = day - 1;
+      setBaseDayInput(newDay.toString());
+      applyShift(newDay); // Added direct call with new day
     } else if (isNaN(day)) {
       setBaseDayInput("1");
+      applyShift(1); // Added direct call with new day
     }
-    applyShift(); // Added direct call
   };
 
   const clearShift = () => {
