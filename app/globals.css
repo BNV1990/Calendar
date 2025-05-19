@@ -366,6 +366,10 @@ body {
   margin: 0 auto; /* Center the block horizontally */
 }
 
+.hours-summary .accordion-header {
+  display: block; /* Show accordion header on desktop */
+}
+
 .hours-summary h3 {
   margin-top: 0;
   margin-bottom: 10px; /* Adjusted bottom margin for consistency */
@@ -395,9 +399,9 @@ body {
   display: grid; /* Use grid layout */
   grid-template-columns: auto 1fr; /* Two columns: auto for legend, 1fr for summary */
   align-items: start; /* Align items to the start of the grid cell */
-  margin-top: 30px;
-  padding-top: 20px;
-  border-top: 1px solid #e0e0e0;
+  margin-top: 0; /* Further reduced top margin */
+  padding-top: 10px; /* Reduced top padding */
+  /* border-top: 1px solid #e0e0e0; */ /* Removed border-top */
   gap: 50px; /* Increased space between the two blocks */
 }
 
@@ -417,6 +421,7 @@ td.highlight-day-shift span.day-number {
   .legend-and-summary-container {
     grid-template-columns: 1fr; /* Stack legend and summary vertically */
     gap: 20px; /* Reduced gap */
+    border-top: none; /* Remove border-top on mobile */
   }
 
   #month-year-header {
@@ -453,6 +458,153 @@ td.highlight-day-shift span.day-number {
 
   .control-buttons-wrapper button {
     font-size: 0.8em; /* Further reduced font size for control buttons on mobile */
+  }
+
+  /* Styles for no-accordion-mobile */
+  .no-accordion-mobile .accordion-header {
+    display: none; /* Hide header on mobile */
+  }
+
+  .no-accordion-mobile .accordion-content {
+    max-height: none; /* Always show content on mobile */
+    overflow: visible;
+  }
+
+  /* Styles for instruction and legend container on mobile */
+  .instruction-and-legend-container {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .instruction-and-legend-container .instruction-text {
+    order: 2; /* Instruction text after legend */
+  }
+
+  .instruction-and-legend-container .legend-and-summary-container {
+    order: 1; /* Legend and summary before instruction text */
+  }
+}
+
+/* Legend mobile/desktop visibility */
+.legend-desktop {
+  display: block; /* Show desktop legend by default */
+}
+
+.legend-mobile {
+  display: none; /* Hide mobile legend by default */
+}
+
+/* Hours summary mobile/desktop visibility */
+.monthly-summary-content.desktop-view {
+  display: block; /* Show desktop hours summary by default */
+}
+
+.monthly-summary-content.mobile-view {
+  display: none; /* Hide mobile hours summary by default */
+}
+
+@media (max-width: 768px) {
+  .legend-desktop {
+    display: none; /* Hide desktop legend on mobile */
+  }
+
+  .legend-mobile {
+    display: flex; /* Show mobile legend on mobile */
+    justify-content: flex-start; /* Align items to the left */
+    gap: 15px; /* Space between legend items */
+    margin-top: 10px; /* Add some space above the legend */
+    flex-wrap: wrap; /* Allow items to wrap */
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    font-size: 0.9em; /* Slightly smaller font for mobile legend */
+  }
+
+  .legend-item .legend-color {
+    width: 15px; /* Smaller color swatch on mobile */
+    height: 15px; /* Smaller color swatch on mobile */
+    margin-right: 5px; /* Reduced margin */
+  }
+
+  /* Hours summary mobile/desktop visibility */
+  .monthly-summary-content.desktop-view {
+    display: none; /* Hide desktop hours summary on mobile */
+  }
+
+  .monthly-summary-content.mobile-view {
+    display: flex; /* Show mobile hours summary on mobile */
+    justify-content: flex-start; /* Align items to the left */
+    gap: 15px; /* Space between summary items */
+    margin-top: 10px; /* Add some space above the summary */
+    flex-wrap: wrap; /* Allow items to wrap */
+  }
+
+  .summary-item {
+    display: flex;
+    align-items: center;
+    font-size: 0.9em; /* Slightly smaller font for mobile summary */
+  }
+
+  .summary-item svg {
+    margin-right: 5px; /* Space between icon and text */
+  }
+
+  .hours-summary-mobile {
+    max-height: none !important; /* Ensure mobile summary is always visible on mobile */
+    overflow: visible !important;
+  }
+
+  .hours-summary .accordion-content {
+    max-height: none !important; /* Ensure monthly summary content is always visible on mobile */
+    overflow: visible !important;
+  }
+}
+
+/* Styles for the tooltip */
+.tooltip {
+  .legend-mobile {
+    display: flex; /* Show mobile legend on mobile */
+    justify-content: flex-start; /* Align items to the left */
+    gap: 15px; /* Space between legend items */
+    margin-top: 10px; /* Add some space above the legend */
+    flex-wrap: wrap; /* Allow items to wrap */
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    font-size: 0.9em; /* Slightly smaller font for mobile legend */
+  }
+
+  .legend-item .legend-color {
+    width: 15px; /* Smaller color swatch on mobile */
+    height: 15px; /* Smaller color swatch on mobile */
+    margin-right: 5px; /* Reduced margin */
+  }
+
+  /* Hours summary mobile/desktop visibility */
+  .hours-summary-desktop {
+    display: none; /* Hide desktop hours summary on mobile */
+  }
+
+  .hours-summary-mobile {
+    display: flex; /* Show mobile hours summary on mobile */
+    justify-content: flex-start; /* Align items to the left */
+    gap: 15px; /* Space between summary items */
+    margin-top: 10px; /* Add some space above the summary */
+    flex-wrap: wrap; /* Allow items to wrap */
+  }
+
+  .summary-item {
+    display: flex;
+    align-items: center;
+    font-size: 0.9em; /* Slightly smaller font for mobile summary */
+  }
+
+  .summary-item svg {
+    margin-right: 5px; /* Space between icon and text */
   }
 }
 
@@ -654,9 +806,9 @@ td.highlight-day-shift span.day-number {
     opacity: 1;
   }
   to {
-  transform: translateX(100%);
-  opacity: 0;
-}
+    transform: translateX(100%);
+    opacity: 0;
+  }
 }
 
 /* Accordion styles (default: always open) */
@@ -708,9 +860,12 @@ td.highlight-day-shift span.day-number {
     max-height: 500px; /* Adjust based on expected content height */
   }
 
-  .legend h3,
-  .hours-summary h3 {
+  .legend h3 {
     margin-bottom: 0; /* Remove bottom margin from headers in mobile accordion */
+  }
+
+  .hours-summary .accordion-header {
+    display: none; /* Hide accordion header on mobile */
   }
 
   .accordion-icon {

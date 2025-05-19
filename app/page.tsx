@@ -152,8 +152,8 @@ const UkrainianCalendar = () => {
             // Highlight the base shift day or the calculated first day shift in the current month
             if (
               (cellDate.getFullYear() === baseShiftInfo.year &&
-              cellDate.getMonth() === baseShiftInfo.month &&
-              cellDate.getDate() === baseShiftInfo.day) ||
+                cellDate.getMonth() === baseShiftInfo.month &&
+                cellDate.getDate() === baseShiftInfo.day) ||
               (date === 1 && shiftTypeForCell === "D") // Highlight the 1st day if it's a Day shift in the current month
             ) {
               cellClassName = "day-shift highlight-day-shift"; // Assuming the highlighted day is always a day shift
@@ -195,7 +195,6 @@ const UkrainianCalendar = () => {
             }
             cellClassName = "off-day"; // Default to off-day if no base shift is set
           }
-
 
           if (isToday) {
             cellClassName += " today";
@@ -517,14 +516,14 @@ const UkrainianCalendar = () => {
               display: "flex",
               justifyContent: "center",
               alignItems: "center",
-            width: "40px", // Match input height
-            height: "40px", // Match input height
-            borderRadius: "6px", // Match input border radius
-            backgroundColor: isSaved ? "#90c79e" : "#ffffff", // Green if saved, white otherwise
-            boxShadow: "0 2px 5px rgba(0, 0, 0, 0.05)", // Match input wrapper shadow
-            cursor: "pointer",
-            transition: "all 0.2s ease-in-out",
-            border: `1px solid ${isSaved ? "#90c79e" : "#dcdcdc"}`, // Green border if saved
+              width: "40px", // Match input height
+              height: "40px", // Match input height
+              borderRadius: "6px", // Match input border radius
+              backgroundColor: isSaved ? "#90c79e" : "#ffffff", // Green if saved, white otherwise
+              boxShadow: "0 2px 5px rgba(0, 0, 0, 0.05)", // Match input wrapper shadow
+              cursor: "pointer",
+              transition: "all 0.2s ease-in-out",
+              border: `1px solid ${isSaved ? "#90c79e" : "#dcdcdc"}`, // Green border if saved
             }}
             className="save-icon"
           >
@@ -563,18 +562,26 @@ const UkrainianCalendar = () => {
         nextMonth={nextMonth}
       />
 
-      <p className="instruction-text">
-        * Виберіть будь-який день поточного місяця, коли у вас ДЕННА зміна!
-      </p>
+      <div className="instruction-and-legend-container">
+        <p className="instruction-text">
+          * Виберіть будь-який день поточного місяця, коли у вас ДЕННА зміна!
+        </p>
 
-      <div className="legend-and-summary-container">
-        <Legend />
-
-        <MonthlySummary
-          totalHours={totalHours}
-          dayHours={dayHours}
-          nightHours={nightHours}
-        />
+        <div className="legend-and-summary-container">
+          {/* Desktop view */}
+          <div className="desktop-legend-summary">
+            <Legend
+              totalHours={totalHours}
+              dayHours={dayHours}
+              nightHours={nightHours}
+            />
+            <MonthlySummary
+              totalHours={totalHours}
+              dayHours={dayHours}
+              nightHours={nightHours}
+            />
+          </div>
+        </div>
       </div>
 
       {/* New container for Save and Reset buttons */}
