@@ -1,8 +1,5 @@
 import React, { useState } from "react";
 import { FaChevronDown } from "react-icons/fa"; // Import an arrow icon
-import { TbClockHour8 } from "react-icons/tb";
-import { GoSun } from "react-icons/go";
-import { MdOutlineNightlight } from "react-icons/md";
 
 interface LegendProps {
   totalHours: number;
@@ -68,18 +65,6 @@ const Legend: React.FC<LegendProps> = ({
           </div>
           <div className="legend-item">
             <span className="legend-color off-day-legend"></span> Вихідний
-          </div>
-        </div>
-        {/* Monthly Summary Mobile */}
-        <div className="monthly-summary-content mobile-view">
-          <div className="summary-item">
-            <TbClockHour8 /> <span>{totalHours}</span>
-          </div>
-          <div className="summary-item">
-            <GoSun /> <span>{dayHours}</span>
-          </div>
-          <div className="summary-item">
-            <MdOutlineNightlight /> <span>{nightHours}</span>
           </div>
         </div>
       </div>

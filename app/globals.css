@@ -535,10 +535,11 @@ td.highlight-day-shift span.day-number {
 
   .monthly-summary-content.mobile-view {
     display: flex; /* Show mobile hours summary on mobile */
-    justify-content: flex-start; /* Align items to the left */
+    justify-content: flex-end; /* Align items to the right */
     gap: 15px; /* Space between summary items */
     margin-top: 10px; /* Add some space above the summary */
     flex-wrap: wrap; /* Allow items to wrap */
+    width: 100%; /* Take full width to allow right alignment */
   }
 
   .summary-item {

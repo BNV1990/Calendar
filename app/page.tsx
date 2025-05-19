@@ -560,6 +560,9 @@ const UkrainianCalendar = () => {
         monthNames={UKRAINIAN_MONTH_NAMES}
         prevMonth={prevMonth}
         nextMonth={nextMonth}
+        totalHours={totalHours}
+        dayHours={dayHours}
+        nightHours={nightHours}
       />
 
       <div className="instruction-and-legend-container">

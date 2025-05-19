@@ -1,5 +1,8 @@
 import React, { useState, useRef, useEffect } from "react";
 import { FaCaretLeft, FaCaretRight } from "react-icons/fa";
+import { TbClockHour8 } from "react-icons/tb";
+import { GoSun } from "react-icons/go";
+import { MdOutlineNightlight } from "react-icons/md";
 
 interface CalendarProps {
   calendarRows: React.JSX.Element[];
@@ -7,6 +10,9 @@ interface CalendarProps {
   monthNames: string[];
   prevMonth: () => void;
   nextMonth: () => void;
+  totalHours: number;
+  dayHours: number;
+  nightHours: number;
 }
 
 type AnimationDirection = 'none' | 'left' | 'right';
@@ -17,6 +23,9 @@ const Calendar: React.FC<CalendarProps> = ({
   monthNames,
   prevMonth,
   nextMonth,
+  totalHours,
+  dayHours,
+  nightHours,
 }) => {
   const [touchStartX, setTouchStartX] = useState(0);
   const [touchEndX, setTouchEndX] = useState(0);
@@ -74,6 +83,19 @@ const Calendar: React.FC<CalendarProps> = ({
           <button id="next-month-button" onClick={nextMonth}>
             <span className="button-text">Наступний</span> <FaCaretRight />
           </button>
+        </div>
+      </div>
+
+      {/* Monthly Summary Mobile */}
+      <div className="monthly-summary-content mobile-view">
+        <div className="summary-item">
+          <TbClockHour8 /> <span>{totalHours}</span>
+        </div>
+        <div className="summary-item">
+          <GoSun /> <span>{dayHours}</span>
+        </div>
+        <div className="summary-item">
+          <MdOutlineNightlight /> <span>{nightHours}</span>
         </div>
       </div>
 
