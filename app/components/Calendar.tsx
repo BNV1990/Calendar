@@ -15,7 +15,7 @@ interface CalendarProps {
   nightHours: number;
 }
 
-type AnimationDirection = 'none' | 'left' | 'right';
+type AnimationDirection = "none" | "left" | "right";
 
 const Calendar: React.FC<CalendarProps> = ({
   calendarRows,
@@ -29,7 +29,8 @@ const Calendar: React.FC<CalendarProps> = ({
 }) => {
   const [touchStartX, setTouchStartX] = useState(0);
   const [touchEndX, setTouchEndX] = useState(0);
-  const [animationDirection, setAnimationDirection] = useState<AnimationDirection>('none');
+  const [animationDirection, setAnimationDirection] =
+    useState<AnimationDirection>("none");
   const calendarRef = useRef<HTMLDivElement>(null);
 
   const handleTouchStart = (e: React.TouchEvent) => {
@@ -45,10 +46,10 @@ const Calendar: React.FC<CalendarProps> = ({
     const distance = touchStartX - touchEndX;
 
     if (distance > threshold) {
-      setAnimationDirection('left');
+      setAnimationDirection("left");
       nextMonth();
     } else if (distance < -threshold) {
-      setAnimationDirection('right');
+      setAnimationDirection("right");
       prevMonth();
     }
     setTouchStartX(0);
@@ -56,9 +57,9 @@ const Calendar: React.FC<CalendarProps> = ({
   };
 
   useEffect(() => {
-    if (animationDirection !== 'none') {
+    if (animationDirection !== "none") {
       const handler = setTimeout(() => {
-        setAnimationDirection('none');
+        setAnimationDirection("none");
       }, 300); // Match this duration with your CSS animation duration
       return () => clearTimeout(handler);
     }
@@ -87,7 +88,10 @@ const Calendar: React.FC<CalendarProps> = ({
       </div>
 
       {/* Monthly Summary Mobile */}
-      <div className="monthly-summary-content mobile-view">
+      <div
+        className="monthly-summary-content mobile-view"
+        style={{ marginBottom: "20px" }}
+      >
         <div className="summary-item">
           <TbClockHour8 /> <span>{totalHours}</span>
         </div>

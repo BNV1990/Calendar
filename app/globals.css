@@ -161,7 +161,7 @@ body {
 #calendar-table {
   width: 100%;
   border-collapse: collapse;
-  margin-bottom: 20px; /* Add bottom margin */
+  margin-bottom: 10px; /* Adjusted bottom margin */
 }
 
 #calendar-table th,
@@ -474,7 +474,7 @@ td.highlight-day-shift span.day-number {
   .instruction-and-legend-container {
     display: flex;
     flex-direction: column;
-    margin-bottom: 20px; /* Add margin below the container on mobile */
+    margin-bottom: 10px; /* Adjusted margin below the container on mobile */
   }
 
   .instruction-and-legend-container .instruction-text {
@@ -877,5 +877,15 @@ td.highlight-day-shift span.day-number {
 
   .accordion-icon {
     display: flex; /* Show icon on mobile */
+  }
+}
+
+.hide-on-mobile {
+  display: block; /* Show by default */
+}
+
+@media (max-width: 768px) {
+  .hide-on-mobile {
+    display: none; /* Hide on screens smaller than 768px */
   }
 }
