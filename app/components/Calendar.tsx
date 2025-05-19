@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { FaCaretLeft, FaCaretRight } from "react-icons/fa";
 
 interface CalendarProps {
@@ -16,6 +16,29 @@ const Calendar: React.FC<CalendarProps> = ({
   prevMonth,
   nextMonth,
 }) => {
+  const [touchStartX, setTouchStartX] = useState(0);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchStartX(e.touches[0].clientX);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    // Prevent default to avoid scrolling while swiping
+    e.preventDefault();
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    const touchEndX = e.changedTouches[0].clientX;
+    const swipeDistance = touchEndX - touchStartX;
+    const swipeThreshold = 50; // Minimum distance for a swipe
+
+    if (swipeDistance > swipeThreshold) {
+      prevMonth();
+    } else if (swipeDistance < -swipeThreshold) {
+      nextMonth();
+    }
+  };
+
   return (
     <>
       <div className="calendar-header">
@@ -32,7 +55,12 @@ const Calendar: React.FC<CalendarProps> = ({
         </div>
       </div>
 
-      <div className="calendar-table-container">
+      <div
+        className="calendar-table-container"
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+      >
         <table id="calendar-table">
           <thead>
             <tr>
