@@ -255,7 +255,7 @@ const UkrainianCalendar = () => {
     } else if (isNaN(day)) {
       setBaseDayInput("1");
     }
-    // applyShift(); // Removed direct call
+    applyShift(); // Added direct call
   };
 
   const decrementDay = () => {
@@ -265,7 +265,7 @@ const UkrainianCalendar = () => {
     } else if (isNaN(day)) {
       setBaseDayInput("1");
     }
-    // applyShift(); // Removed direct call
+    applyShift(); // Added direct call
   };
 
   const clearShift = () => {
@@ -292,12 +292,6 @@ const UkrainianCalendar = () => {
       return newDate;
     });
   };
-
-  // Apply shift whenever baseDayInput changes
-  useEffect(() => {
-    if (isNaN(parseInt(baseDayInput))) return; // Prevent applying shift if input is not a number
-    applyShift();
-  }, [baseDayInput]); // Dependency on baseDayInput
 
   useEffect(() => {
     const { rows, totalH, dayH, nightH } = generateCalendarData();
@@ -347,7 +341,9 @@ const UkrainianCalendar = () => {
         nextMonth={nextMonth}
       />
 
-      <p className="instruction-text">* Виберіть будь-який день поточного місяця, коли у вас "ДЕННА" зміна!</p>
+      <p className="instruction-text">
+        * Виберіть будь-який день поточного місяця, коли у вас ДЕННА зміна!
+      </p>
 
       <div className="legend-and-summary-container">
         <Legend />
