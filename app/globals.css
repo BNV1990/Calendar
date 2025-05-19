@@ -225,6 +225,57 @@ body {
   text-align: left;
 }
 
+/* Keyframes for the jump animation */
+@keyframes jump {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px); /* Jump up 5px */
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+/* Apply jump animation on hover to the save icon's SVG */
+.save-icon:hover svg {
+  animation: jump 0.5s ease-in-out; /* Apply the animation */
+}
+
+/* Styles for the save and reset buttons container */
+.save-reset-buttons-container {
+  display: flex;
+  justify-content: center; /* Center the buttons */
+  align-items: center;
+  margin-top: 20px; /* Add some space above the buttons */
+  gap: 10px; /* Space between the buttons */
+}
+
+/* Add margin to the save icon to match the autorenew icon spacing */
+.save-icon {
+  margin-left: 10px;
+}
+
+/* Styles for the reset button */
+.reset-button {
+  background-color: #6c757d; /* Secondary grey */
+  padding: 10px 20px; /* Adjusted padding */
+  color: white;
+  border: none;
+  border-radius: 6px; /* More rounded corners */
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  font-size: 1em;
+  font-weight: 500;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+}
+
+.reset-button:hover {
+  background-color: #5a6268;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
 @media (max-width: 768px) {
   .day-input-wrapper .control-day-input:focus {
     outline: none;

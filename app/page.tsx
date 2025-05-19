@@ -5,6 +5,7 @@ import Legend from "./components/Legend";
 import MonthlySummary from "./components/MonthlySummary";
 import Calendar from "./components/Calendar";
 import AutorenewIcon from "./components/AutorenewIcon";
+import { BsSave } from "react-icons/bs";
 
 interface ShiftInfo {
   year: number;
@@ -42,6 +43,7 @@ const UkrainianCalendar = () => {
   ); // Initial state for 1st day
   const [baseDayInput, setBaseDayInput] = useState("1"); // Initial value is "1"
   const [calendarRows, setCalendarRows] = useState<React.JSX.Element[]>([]);
+  const [isSaved, setIsSaved] = useState(false); // New state for save status
 
   // State for hours summary
   const [totalHours, setTotalHours] = useState(0);
@@ -72,6 +74,27 @@ const UkrainianCalendar = () => {
     []
   ); // SHIFT_CYCLE_VALUES is a constant from outer scope, so it's stable.
   // exhaustive-deps might suggest adding SHIFT_CYCLE_VALUES here; it's good practice: [SHIFT_CYCLE_VALUES]
+
+  // Helper function to find the first day shift in a given month
+  const findFirstDayShiftInMonth = useCallback(
+    (
+      year: number,
+      month: number,
+      currentBaseShiftInfo: ShiftInfo | null
+    ): number | null => {
+      if (!currentBaseShiftInfo) return null;
+
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+      for (let day = 1; day <= daysInMonth; day++) {
+        const date = new Date(year, month, day);
+        if (getShiftForDate(date, currentBaseShiftInfo) === "D") {
+          return day;
+        }
+      }
+      return null; // Should not happen if a base shift is set
+    },
+    [getShiftForDate]
+  );
 
   const generateCalendarData = useCallback(() => {
     const year = currentDate.getFullYear();
@@ -125,6 +148,7 @@ const UkrainianCalendar = () => {
 
             // Highlight the base shift day if it's a day shift
             if (
+              baseShiftInfo && // Added null check
               cellDate.getFullYear() === baseShiftInfo.year &&
               cellDate.getMonth() === baseShiftInfo.month &&
               cellDate.getDate() === baseShiftInfo.day &&
@@ -205,7 +229,56 @@ const UkrainianCalendar = () => {
           console.error("Service Worker registration failed:", error);
         });
     }
-  }, []);
+
+    // Load saved base day from local storage on mount
+    const savedDay = localStorage.getItem("savedBaseDay");
+    if (savedDay) {
+      const day = parseInt(savedDay);
+      const today = new Date();
+      const currentYearVal = today.getFullYear();
+      const currentMonthVal = today.getMonth();
+      const daysInCurrentMonth = new Date(
+        currentYearVal,
+        currentMonthVal + 1,
+        0
+      ).getDate();
+
+      if (!isNaN(day) && day >= 1 && day <= daysInCurrentMonth) {
+        setBaseShiftInfo({
+          year: currentYearVal,
+          month: currentMonthVal,
+          day: day,
+        });
+        setBaseDayInput(savedDay);
+      }
+    }
+  }, []); // Empty dependency array means this runs once on mount
+
+  // Load saved base day from local storage after mount
+  useEffect(() => {
+    const savedDay = localStorage.getItem("savedBaseDay");
+    if (savedDay) {
+      const day = parseInt(savedDay);
+      const today = new Date();
+      const currentYearVal = today.getFullYear();
+      const currentMonthVal = today.getMonth();
+      const daysInCurrentMonth = new Date(
+        currentYearVal,
+        currentMonthVal + 1,
+        0
+      ).getDate();
+
+      if (!isNaN(day) && day >= 1 && day <= daysInCurrentMonth) {
+        setBaseShiftInfo({
+          year: currentYearVal,
+          month: currentMonthVal,
+          day: day,
+        });
+        setBaseDayInput(savedDay);
+        setIsSaved(true); // Set isSaved to true if saved day is found
+      }
+    }
+  }, []); // Empty dependency array means this runs once on mount
 
   const applyShift = (day: number) => {
     const today = new Date(); // Get current date
@@ -271,19 +344,101 @@ const UkrainianCalendar = () => {
     }
   };
 
+  const saveShift = () => {
+    if (isSaved) {
+      // If currently saved, unsave it
+      localStorage.removeItem("savedBaseDay");
+      setIsSaved(false);
+      alert("Базовий день скасовано.");
+    } else {
+      // If not saved, save it
+      if (baseShiftInfo) {
+        localStorage.setItem("savedBaseDay", baseShiftInfo.day.toString());
+        setIsSaved(true);
+        alert("Ваш базовий день збережено!");
+      } else {
+        alert("Немає базового дня для збереження.");
+      }
+    }
+  };
+
+  // Modify clearShift to reset the base day to the saved day or 1st and navigate to the current month
   const clearShift = () => {
-    setBaseShiftInfo(initialBaseShiftInfo); // Set to initial state for 1st day
-    setBaseDayInput("1"); // Set to "1" instead of empty string
-    setTotalHours(0);
-    setDayHours(0);
-    setNightHours(0);
+    const today = new Date();
+    const currentYearVal = today.getFullYear();
+    const currentMonthVal = today.getMonth();
+    const daysInCurrentMonth = new Date(
+      currentYearVal,
+      currentMonthVal + 1,
+      0
+    ).getDate();
+
+    const savedDay = localStorage.getItem("savedBaseDay");
+    let dayToSet = 1; // Default to 1
+
+    if (savedDay) {
+      const parsedSavedDay = parseInt(savedDay);
+      // Check if the saved day is valid for the current month
+      if (
+        !isNaN(parsedSavedDay) &&
+        parsedSavedDay >= 1 &&
+        parsedSavedDay <= daysInCurrentMonth
+      ) {
+        dayToSet = parsedSavedDay;
+      } else {
+        // If saved day is invalid, remove it from local storage
+        localStorage.removeItem("savedBaseDay");
+      }
+    }
+
+    setBaseShiftInfo({
+      year: currentYearVal,
+      month: currentMonthVal,
+      day: dayToSet,
+    });
+    setBaseDayInput(dayToSet.toString());
     setCurrentDate(new Date()); // Navigate to current month
+    // Removed alert
   };
 
   const prevMonth = () => {
     setCurrentDate((prevDate) => {
       const newDate = new Date(prevDate);
       newDate.setMonth(newDate.getMonth() - 1);
+
+      // Find the first day shift in the new month
+      if (baseShiftInfo) {
+        const firstDay = findFirstDayShiftInMonth(
+          newDate.getFullYear(),
+          newDate.getMonth(),
+          baseShiftInfo
+        );
+        if (firstDay !== null) {
+          setBaseShiftInfo({
+            year: newDate.getFullYear(),
+            month: newDate.getMonth(),
+            day: firstDay,
+          });
+          setBaseDayInput(firstDay.toString());
+        } else {
+          // If no day shift found in the new month, reset to day 1
+          setBaseShiftInfo({
+            year: newDate.getFullYear(),
+            month: newDate.getMonth(),
+            day: 1,
+          });
+          setBaseDayInput("1");
+        }
+      } else {
+        // If no base shift is set, reset to day 1 for the new month
+        setBaseShiftInfo({
+          year: newDate.getFullYear(),
+          month: newDate.getMonth(),
+          day: 1,
+        });
+        setBaseDayInput("1");
+      }
+
       return newDate;
     });
   };
@@ -292,6 +447,40 @@ const UkrainianCalendar = () => {
     setCurrentDate((prevDate) => {
       const newDate = new Date(prevDate);
       newDate.setMonth(newDate.getMonth() + 1);
+
+      // Find the first day shift in the new month
+      if (baseShiftInfo) {
+        const firstDay = findFirstDayShiftInMonth(
+          newDate.getFullYear(),
+          newDate.getMonth(),
+          baseShiftInfo
+        );
+        if (firstDay !== null) {
+          setBaseShiftInfo({
+            year: newDate.getFullYear(),
+            month: newDate.getMonth(),
+            day: firstDay,
+          });
+          setBaseDayInput(firstDay.toString());
+        } else {
+          // If no day shift found in the new month, reset to day 1
+          setBaseShiftInfo({
+            year: newDate.getFullYear(),
+            month: newDate.getMonth(),
+            day: 1,
+          });
+          setBaseDayInput("1");
+        }
+      } else {
+        // If no base shift is set, reset to day 1 for the new month
+        setBaseShiftInfo({
+          year: newDate.getFullYear(),
+          month: newDate.getMonth(),
+          day: 1,
+        });
+        setBaseDayInput("1");
+      }
+
       return newDate;
     });
   };
@@ -312,6 +501,28 @@ const UkrainianCalendar = () => {
         <div className="input-and-clear-wrapper">
           {" "}
           {/* New wrapper */}
+          {/* Save Icon (moved from below) */}
+          <div
+            onClick={saveShift}
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            width: "40px", // Match input height
+            height: "40px", // Match input height
+            borderRadius: "6px", // Match input border radius
+            backgroundColor: isSaved ? "#90c79e" : "#ffffff", // Green if saved, white otherwise
+            boxShadow: "0 2px 5px rgba(0, 0, 0, 0.05)", // Match input wrapper shadow
+            cursor: "pointer",
+            transition: "all 0.2s ease-in-out",
+            border: `1px solid ${isSaved ? "#90c79e" : "#dcdcdc"}`, // Green border if saved
+            marginRight: "8px", // Add some space to the right
+            }}
+            className="save-icon"
+          >
+            <BsSave size={24} color={isSaved ? "#ffffff" : "#555"} />{" "}
+            {/* White icon if saved */}
+          </div>
           <div className="day-input-wrapper">
             {" "}
             {/* Wrapper for input and buttons */}
@@ -357,6 +568,9 @@ const UkrainianCalendar = () => {
           nightHours={nightHours}
         />
       </div>
+
+      {/* New container for Save and Reset buttons */}
+      <div className="save-reset-buttons-container"></div>
     </div>
   );
 };
