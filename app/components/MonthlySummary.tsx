@@ -1,18 +1,8 @@
 import React from 'react';
 
-interface MonthlySummaryProps {
-  totalHours: number;
-  dayHours: number;
-  nightHours: number;
-}
-
-const MonthlySummary: React.FC<MonthlySummaryProps> = ({
-  totalHours,
-  dayHours,
-  nightHours,
-}) => {
+const MonthlySummary = () => {
   return (
-    <div className="hours-summary">
+    <div className="hours-summary" style={{ marginBottom: '20px' }}>
     </div>
   );
 };

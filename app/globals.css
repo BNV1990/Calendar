@@ -474,6 +474,7 @@ td.highlight-day-shift span.day-number {
   .instruction-and-legend-container {
     display: flex;
     flex-direction: column;
+    margin-bottom: 20px; /* Add margin below the container on mobile */
   }
 
   .instruction-and-legend-container .instruction-text {
@@ -560,6 +561,11 @@ td.highlight-day-shift span.day-number {
   .hours-summary .accordion-content {
     max-height: none !important; /* Ensure monthly summary content is always visible on mobile */
     overflow: visible !important;
+  }
+
+  /* Add gap between legend and summary container on mobile */
+  .legend-and-summary-container {
+    gap: 15px;
   }
 }
 

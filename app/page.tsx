@@ -570,20 +570,13 @@ const UkrainianCalendar = () => {
           * Виберіть будь-який день поточного місяця, коли у вас ДЕННА зміна!
         </p>
 
-        <div className="legend-and-summary-container">
-          {/* Desktop view */}
-          <div className="desktop-legend-summary">
-            <Legend
-              totalHours={totalHours}
-              dayHours={dayHours}
-              nightHours={nightHours}
-            />
-            <MonthlySummary
-              totalHours={totalHours}
-              dayHours={dayHours}
-              nightHours={nightHours}
-            />
-          </div>
+        <div className="legend-and-summary-container" style={{ marginBottom: '20px' }}>
+          <Legend
+            totalHours={totalHours}
+            dayHours={dayHours}
+            nightHours={nightHours}
+          />
+          <MonthlySummary />
         </div>
       </div>
 
