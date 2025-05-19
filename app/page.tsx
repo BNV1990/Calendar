@@ -516,7 +516,6 @@ const UkrainianCalendar = () => {
             cursor: "pointer",
             transition: "all 0.2s ease-in-out",
             border: `1px solid ${isSaved ? "#90c79e" : "#dcdcdc"}`, // Green border if saved
-            marginRight: "8px", // Add some space to the right
             }}
             className="save-icon"
           >
