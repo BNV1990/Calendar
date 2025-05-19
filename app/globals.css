@@ -375,3 +375,84 @@ td.highlight-day-shift span.day-number {
     font-size: 0.8em; /* Further reduced font size for control buttons on mobile */
   }
 }
+
+/* Styles for the tooltip */
+.tooltip {
+  position: absolute;
+  bottom: 100%; /* Position above the button */
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #fff;
+  color: #333;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  white-space: nowrap; /* Prevent text wrapping */
+  z-index: 10; /* Ensure it's above other elements */
+  margin-bottom: 5px; /* Space between tooltip and button */
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.tooltip-close-button {
+  background: none;
+  border: none;
+  color: #aaa;
+  cursor: pointer;
+  font-size: 1em;
+  padding: 0;
+}
+
+.tooltip-close-button:hover {
+  color: #777;
+}
+
+/* Styles for the day input wrapper */
+.day-input-wrapper {
+  display: flex;
+  align-items: center;
+  border: 1px solid #dcdcdc; /* Match input border */
+  border-radius: 6px; /* Match input border radius */
+  overflow: hidden; /* Hide overflow from rounded corners */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05); /* Subtle shadow */
+}
+
+/* Adjust input style within the wrapper */
+.day-input-wrapper .control-day-input {
+  border: none; /* Remove individual input border */
+  border-radius: 0; /* Remove individual input border radius */
+  padding: 10px 5px; /* Adjust padding */
+  width: 60px; /* Adjust width */
+  text-align: center;
+}
+
+/* Styles for the control buttons */
+.day-control-button {
+  background-color: #fff; /* White background */
+  color: #495057; /* Dark grey text */
+  border: none; /* Remove border */
+  padding: 10px 15px; /* Adjusted padding */
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+  font-size: 1.1em;
+  font-weight: bold;
+  flex-shrink: 0; /* Prevent shrinking */
+  width: 40px; /* Fixed width for equal size */
+  text-align: center; /* Center the text/icon */
+}
+
+.day-control-button:hover {
+  background-color: #f0f0f0; /* Slightly darker on hover */
+}
+
+.day-control-button:first-child {
+  border-top-left-radius: 6px;
+  border-bottom-left-radius: 6px;
+}
+
+.day-control-button:last-child {
+  border-top-right-radius: 6px;
+  border-bottom-right-radius: 6px;
+}

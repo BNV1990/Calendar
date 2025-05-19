@@ -29,9 +29,15 @@ const UKRAINIAN_MONTH_NAMES = [
 ];
 
 const UkrainianCalendar = () => {
+  const today = new Date();
+  const initialBaseShiftInfo = {
+    year: today.getFullYear(),
+    month: today.getMonth(),
+    day: 1,
+  };
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [baseShiftInfo, setBaseShiftInfo] = useState<ShiftInfo | null>(null);
-  const [baseDayInput, setBaseDayInput] = useState("");
+  const [baseShiftInfo, setBaseShiftInfo] = useState<ShiftInfo | null>(initialBaseShiftInfo); // Initial state for 1st day
+  const [baseDayInput, setBaseDayInput] = useState("1"); // Initial value is "1"
   const [calendarRows, setCalendarRows] = useState<React.JSX.Element[]>([]);
 
   // State for hours summary
@@ -200,8 +206,9 @@ const UkrainianCalendar = () => {
 
   const applyShift = () => {
     const day = parseInt(baseDayInput);
-    const currentYearVal = currentDate.getFullYear();
-    const currentMonthVal = currentDate.getMonth();
+    const today = new Date(); // Get current date
+    const currentYearVal = today.getFullYear(); // Use current year
+    const currentMonthVal = today.getMonth(); // Use current month
     const daysInCurrentMonth = new Date(
       currentYearVal,
       currentMonthVal + 1,
@@ -214,19 +221,57 @@ const UkrainianCalendar = () => {
       );
       return;
     }
+
+    // Set baseShiftInfo using the current month and year
     setBaseShiftInfo({
       year: currentYearVal,
       month: currentMonthVal,
       day: day,
     });
+
+    // If the current view is not the current month, navigate to the current month
+    if (
+      currentDate.getMonth() !== currentMonthVal ||
+      currentDate.getFullYear() !== currentYearVal
+    ) {
+      setCurrentDate(new Date());
+    }
+  };
+
+  const incrementDay = () => {
+    const day = parseInt(baseDayInput);
+    const currentMonthVal = new Date().getMonth();
+    const currentYearVal = new Date().getFullYear();
+    const daysInCurrentMonth = new Date(
+      currentYearVal,
+      currentMonthVal + 1,
+      0
+    ).getDate();
+    if (!isNaN(day) && day < daysInCurrentMonth) {
+      setBaseDayInput((day + 1).toString());
+    } else if (isNaN(day)) {
+      setBaseDayInput("1");
+    }
+    // applyShift(); // Removed direct call
+  };
+
+  const decrementDay = () => {
+    const day = parseInt(baseDayInput);
+    if (!isNaN(day) && day > 1) {
+      setBaseDayInput((day - 1).toString());
+    } else if (isNaN(day)) {
+      setBaseDayInput("1");
+    }
+    // applyShift(); // Removed direct call
   };
 
   const clearShift = () => {
-    setBaseShiftInfo(null);
-    setBaseDayInput("");
+    setBaseShiftInfo(initialBaseShiftInfo); // Set to initial state for 1st day
+    setBaseDayInput("1"); // Set to "1" instead of empty string
     setTotalHours(0);
     setDayHours(0);
     setNightHours(0);
+    setCurrentDate(new Date()); // Navigate to current month
   };
 
   const prevMonth = () => {
@@ -245,6 +290,12 @@ const UkrainianCalendar = () => {
     });
   };
 
+  // Apply shift whenever baseDayInput changes
+  useEffect(() => {
+    if (isNaN(parseInt(baseDayInput))) return; // Prevent applying shift if input is not a number
+    applyShift();
+  }, [baseDayInput]); // Dependency on baseDayInput
+
   useEffect(() => {
     const { rows, totalH, dayH, nightH } = generateCalendarData();
     setCalendarRows(rows);
@@ -261,15 +312,25 @@ const UkrainianCalendar = () => {
         <label htmlFor="base-day-input" className="control-main-label">
           Вкажіть день поточного місяця, коли у вас ДЕННА зміна:
         </label>
-        <input
-          type="number"
-          id="base-day-input"
-          min="1"
-          max="31"
-          className="control-day-input"
-          value={baseDayInput}
-          onChange={(e) => setBaseDayInput(e.target.value)}
-        />
+        <div className="day-input-wrapper">
+          {" "}
+          {/* Wrapper for input and buttons */}
+          <button onClick={decrementDay} className="day-control-button">
+            -
+          </button>
+          <input
+            type="number"
+            id="base-day-input"
+            min="1"
+            max="31"
+            className="control-day-input"
+            value={baseDayInput}
+            onChange={(e) => setBaseDayInput(e.target.value)}
+          />
+          <button onClick={incrementDay} className="day-control-button">
+            +
+          </button>
+        </div>
         <div className="control-buttons-wrapper">
           <button id="apply-shift-button" onClick={applyShift}>
             Застосувати графік
