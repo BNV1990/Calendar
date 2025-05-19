@@ -225,6 +225,13 @@ body {
   text-align: left;
 }
 
+@media (max-width: 768px) {
+  .day-input-wrapper .control-day-input:focus {
+    outline: none;
+    box-shadow: none;
+  }
+}
+
 .legend h3 {
   margin-top: 0;
   margin-bottom: 10px; /* Adjusted bottom margin for consistency */
