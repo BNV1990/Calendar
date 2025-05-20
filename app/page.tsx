@@ -566,9 +566,6 @@ const UkrainianCalendar = () => {
       />
 
       <div className="instruction-and-legend-container">
-        <p className="instruction-text hide-on-mobile">
-          * Виберіть будь-який день поточного місяця, коли у вас ДЕННА зміна!
-        </p>
 
         <div className="legend-and-summary-container" style={{ marginTop: '10px' }}>
           <Legend />
