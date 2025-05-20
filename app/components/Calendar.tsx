@@ -75,13 +75,13 @@ const Calendar: React.FC<CalendarProps> = ({
     >
       <div className="calendar-header">
         <div className="month-navigation">
-          <button id="prev-month-button" onClick={(e) => { e.stopPropagation(); prevMonth(); }} style={{ minWidth: '44px', minHeight: '44px', zIndex: 10 }}>
+          <button id="prev-month-button" onClick={(e) => { e.stopPropagation(); prevMonth(); }} onTouchStart={(e) => { e.stopPropagation(); prevMonth(); }} style={{ minWidth: '44px', minHeight: '44px', zIndex: 10 }}>
             <FaCaretLeft /> <span className="button-text">Попередній</span>
           </button>
           <h2 id="month-year-header">{`${
             monthNames[currentDate.getMonth()]
           } ${currentDate.getFullYear()}`}</h2>
-          <button id="next-month-button" onClick={(e) => { e.stopPropagation(); nextMonth(); }} style={{ minWidth: '44px', minHeight: '44px', zIndex: 10 }}>
+          <button id="next-month-button" onClick={(e) => { e.stopPropagation(); nextMonth(); }} onTouchStart={(e) => { e.stopPropagation(); nextMonth(); }} style={{ minWidth: '44px', minHeight: '44px', zIndex: 10 }}>
             <span className="button-text">Наступний</span> <FaCaretRight />
           </button>
         </div>
