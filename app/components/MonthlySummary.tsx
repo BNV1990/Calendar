@@ -1,4 +1,5 @@
 import React from 'react';
+import { BsClock, BsSun, BsMoon } from 'react-icons/bs';
 
 interface MonthlySummaryProps {
   totalHours: number;
@@ -13,11 +14,10 @@ const MonthlySummary: React.FC<MonthlySummaryProps> = ({
 }) => {
   return (
     <div className="hours-summary" style={{ marginBottom: '20px' }}>
-      <h2>Підсумок годин за місяць:</h2>
       <div className="hours-summary-items">
-        <p>Загальна кількість годин:<span>{totalHours}</span></p>
-        <p>Денних годин:<span>{dayHours}</span></p>
-        <p>Нічних годин:<span>{nightHours}</span></p>
+        <div><BsClock size={18} /><span>{totalHours}</span></div>
+        <div><BsSun size={18} /><span>{dayHours}</span></div>
+        <div><BsMoon size={18} /><span>{nightHours}</span></div>
       </div>
     </div>
   );

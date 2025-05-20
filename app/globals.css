@@ -383,6 +383,12 @@ body {
   justify-content: center; /* Center items horizontally */
 }
 
+.hours-summary-items div {
+  display: flex;
+  align-items: center; /* Vertically align icon and number */
+  gap: 5px; /* Small space between icon and number */
+}
+
 .hours-summary h2 {
   margin-top: 0;
   margin-bottom: 10px;
@@ -545,12 +551,8 @@ td.highlight-day-shift span.day-number {
 }
 
 /* Hours summary mobile/desktop visibility */
-.monthly-summary-content.desktop-view {
-  display: none; /* Hide desktop hours summary by default */
-}
-
 .monthly-summary-content.mobile-view {
-  display: block; /* Show mobile hours summary by default */
+  display: flex; /* Show mobile hours summary by default */
 }
 
 /* Hide mobile summary on desktop */
@@ -585,9 +587,7 @@ td.highlight-day-shift span.day-number {
   }
 
   /* Hours summary mobile/desktop visibility */
-  .monthly-summary-content.desktop-view {
-    display: none; /* Hide desktop hours summary on mobile */
-  }
+  /* Removed desktop view rule */
 
   .monthly-summary-content.mobile-view {
     display: flex; /* Show mobile hours summary on mobile */

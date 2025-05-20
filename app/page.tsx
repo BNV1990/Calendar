@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState, useCallback } from "react";
 import Legend from "./components/Legend";
-import MonthlySummary from "./components/MonthlySummary";
 import Calendar from "./components/Calendar";
 import AutorenewIcon from "./components/AutorenewIcon";
 import { BsSave } from "react-icons/bs";
@@ -569,11 +568,6 @@ const UkrainianCalendar = () => {
 
         <div className="legend-and-summary-container" style={{ marginTop: '10px' }}>
           <Legend />
-          <MonthlySummary
-            totalHours={totalHours}
-            dayHours={dayHours}
-            nightHours={nightHours}
-          />
         </div>
       </div>
 
