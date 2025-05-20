@@ -15,17 +15,47 @@ const MonthlySummary: React.FC<MonthlySummaryProps> = ({
   return (
     <div className="hours-summary" style={{ marginBottom: "20px" }}>
       <div className="hours-summary-items pc-align-right">
-        <div>
-          <BsClock size={18} />
-          <span>{totalHours}</span>
+        <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
+          <BsClock
+            size={18}
+            style={{
+              color: "#333",
+              fill: "#333",
+              position: "relative",
+              top: "2px",
+            }}
+          />
+          <span style={{ color: "#333", verticalAlign: "middle" }}>
+            {totalHours}
+          </span>
         </div>
-        <div>
-          <BsSun size={18} />
-          <span>{dayHours}</span>
+        <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
+          <BsSun
+            size={18}
+            style={{
+              color: "#333",
+              fill: "#333",
+              position: "relative",
+              top: "2px",
+            }}
+          />
+          <span style={{ color: "#333", verticalAlign: "middle" }}>
+            {dayHours}
+          </span>
         </div>
-        <div>
-          <BsMoon size={18} />
-          <span>{nightHours}</span>
+        <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
+          <BsMoon
+            size={18}
+            style={{
+              color: "#333",
+              fill: "#333",
+              position: "relative",
+              top: "2px",
+            }}
+          />
+          <span style={{ color: "#333", verticalAlign: "middle" }}>
+            {nightHours}
+          </span>
         </div>
       </div>
     </div>

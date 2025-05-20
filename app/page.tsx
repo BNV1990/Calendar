@@ -356,15 +356,15 @@ const UkrainianCalendar = () => {
       // If currently saved, unsave it
       localStorage.removeItem("savedBaseDay");
       setIsSaved(false);
-      alert("Базовий день скасовано.");
+      alert("Зберігання робочої зміни скасовано!");
     } else {
       // If not saved, save it
       if (baseShiftInfo) {
         localStorage.setItem("savedBaseDay", baseShiftInfo.day.toString());
         setIsSaved(true);
-        alert("Ваш базовий день збережено!");
+        alert("Робоча зміна збережена!");
       } else {
-        alert("Немає базового дня для збереження.");
+        alert("Немає робочої зміни для збереження.");
       }
     }
   };
@@ -565,8 +565,10 @@ const UkrainianCalendar = () => {
       />
 
       <div className="instruction-and-legend-container">
-
-        <div className="legend-and-summary-container" style={{ marginTop: '10px' }}>
+        <div
+          className="legend-and-summary-container"
+          style={{ marginTop: "10px" }}
+        >
           <Legend />
         </div>
       </div>
