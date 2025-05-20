@@ -368,19 +368,33 @@ body {
   margin-top: 0; /* Increased top margin */
   padding-top: 0; /* Increased top padding */
   border-top: none; /* Lighter border */
-  text-align: left;
+  /* text-align: left; */
   color: #333;
   margin: 0 auto; /* Center the block horizontally */
-  text-align: left; /* Align text to the left */
-  display: none; /* Hide on desktop */
+  /* text-align: left; */ /* Align text to the left */
+  width: 100%; /* Ensure it takes full width of grid cell */
+  justify-self: end; /* Align to the end of the grid cell */
+}
+
+@media (max-width: 768px) {
+  .hours-summary {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .hours-summary {
+    display: none;
+  }
 }
 
 .hours-summary-items {
   display: flex;
   flex-direction: row;
-  gap: 20px; /* Space between items */
+  gap: 15px; /* Space between items */
   flex-wrap: wrap; /* Allow items to wrap if needed */
-  justify-content: center; /* Center items horizontally */
+  justify-content: flex-end;
+  width: 100%; /* ADD THIS LINE */
 }
 
 .hours-summary-items div {
@@ -463,7 +477,6 @@ td.highlight-day-shift span.day-number {
   display: inline-block; /* Ensure span behaves as a block for text-align */
   min-width: 50px; /* Give the span a minimum width to help with alignment */
 }
-
 
 @media (max-width: 600px) {
   #calendar-table th,
@@ -553,6 +566,10 @@ td.highlight-day-shift span.day-number {
 /* Hours summary mobile/desktop visibility */
 .monthly-summary-content.mobile-view {
   display: flex; /* Show mobile hours summary by default */
+  justify-content: flex-end; /* Align items to the right */
+  gap: 15px; /* Space between summary items */
+  flex-wrap: wrap; /* Allow items to wrap if needed */
+  width: 100%; /* Take full width to allow right alignment */
 }
 
 /* Hide mobile summary on desktop */
