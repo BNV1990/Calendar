@@ -9,6 +9,7 @@ body {
   background-color: #eef2f7; /* Softer background */
   padding: 20px;
   box-sizing: border-box; /* Include padding in element's total width and height */
+  overflow-y: scroll; /* Always show vertical scrollbar to prevent horizontal shifting */
 }
 
 .container {
@@ -19,7 +20,7 @@ body {
   text-align: center;
   width: 100%; /* Use full width on smaller screens */
   max-width: 750px; /* Slightly increased max-width */
-  margin-top: 20px; /* Add margin top */
+  margin-top: 5px; /* Reduced margin top to 5px */
 }
 
 @media (max-width: 768px) {
