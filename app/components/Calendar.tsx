@@ -81,12 +81,14 @@ const Calendar: React.FC<CalendarProps> = ({
             id="prev-month-button"
             onTouchStart={(e) => {
               e.stopPropagation();
+              setAnimationDirection("right");
               prevMonth();
             }}
             onClick={() => {
               if (Date.now() - lastTouchTime < 300) {
                 return;
               }
+              setAnimationDirection("right");
               prevMonth();
             }}
             style={{ minWidth: "44px", minHeight: "44px", zIndex: 10 }}
@@ -100,12 +102,14 @@ const Calendar: React.FC<CalendarProps> = ({
             id="next-month-button"
             onTouchStart={(e) => {
               e.stopPropagation();
+              setAnimationDirection("left");
               nextMonth();
             }}
             onClick={() => {
               if (Date.now() - lastTouchTime < 300) {
                 return;
               }
+              setAnimationDirection("left");
               nextMonth();
             }}
             style={{ minWidth: "44px", minHeight: "44px", zIndex: 10 }}

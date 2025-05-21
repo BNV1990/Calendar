@@ -29,6 +29,219 @@ body {
   }
 }
 
+/* Dark Mode Styles */
+body.dark-mode {
+  background-color: #1a1a1a; /* Dark background */
+  color: #e0e0e0; /* Light text */
+}
+
+body.dark-mode .container {
+  background-color: #2d2d2d; /* Darker container background */
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3); /* Darker shadow */
+}
+
+body.dark-mode .control-main-label {
+  color: #ff6b6b; /* Lighter red for dark mode */
+}
+
+body.dark-mode .control-day-input {
+  background-color: #3a3a3a; /* Dark input background */
+  border-color: #555; /* Darker border */
+  color: #e0e0e0; /* Light text */
+}
+
+body.dark-mode .control-day-input:focus {
+  border-color: #555; /* Keep dark border on focus */
+}
+
+body.dark-mode .control-buttons-wrapper button {
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3); /* Darker shadow */
+}
+
+body.dark-mode #apply-shift-button {
+  background-color: #0056b3; /* Darker blue */
+}
+
+body.dark-mode #apply-shift-button:hover {
+  background-color: #003f80;
+}
+
+body.dark-mode #clear-shift-button {
+  background-color: #5a6268; /* Darker grey */
+}
+
+body.dark-mode #clear-shift-button:hover {
+  background-color: #495057;
+}
+
+body.dark-mode .calendar-header button {
+  background-color: #3a3a3a; /* Dark button background */
+  border-color: #555; /* Darker border */
+  color: #e0e0e0; /* Light text */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3); /* Darker shadow */
+}
+
+body.dark-mode .calendar-header button:hover {
+  background-color: #555; /* Darker background on hover */
+  border-color: #666;
+}
+
+body.dark-mode #month-year-header {
+  color: #e0e0e0; /* Light text */
+}
+
+body.dark-mode #calendar-table th {
+  background-color: #3a3a3a; /* Dark header background */
+  color: #e0e0e0; /* Light text */
+}
+
+body.dark-mode #calendar-table td {
+  border-color: #555; /* Darker border */
+}
+
+body.dark-mode .day-shift {
+  background-color: #5a6268; /* Darker muted green */
+  color: #e0e0e0; /* Light text */
+}
+
+body.dark-mode .night-shift {
+  background-color: #495057; /* Darker muted blue */
+  color: #e0e0e0; /* Light text */
+}
+
+body.dark-mode .off-day {
+  background-color: #2d2d2d; /* Darker background for off days */
+}
+
+body.dark-mode .off-day .day-number {
+  color: #aaa; /* Lighter grey for off day numbers */
+}
+
+body.dark-mode .empty-cell {
+  background-color: #1a1a1a; /* Darker background for empty cells */
+}
+
+body.dark-mode .today {
+  border-color: #0056b3; /* Darker blue border */
+  background-color: #3a3a3a; /* Darker background for today */
+  color: #e0e0e0; /* Light text */
+}
+
+body.dark-mode .legend h3 {
+  color: #e0e0e0; /* Light text */
+}
+
+body.dark-mode .legend p {
+  color: #e0e0e0; /* Light text */
+}
+
+body.dark-mode .legend-color {
+  border-color: #555; /* Darker border */
+}
+
+body.dark-mode .day-shift-legend {
+  background-color: #5a6268; /* Darker muted green */
+}
+
+body.dark-mode .night-shift-legend {
+  background-color: #495057; /* Darker muted blue */
+}
+
+body.dark-mode .off-day-legend {
+  background-color: #2d2d2d; /* Darker background */
+}
+
+body.dark-mode .hours-indicator {
+  color: #28a745; /* Keep green for hours indicator */
+  background-color: rgba(0, 0, 0, 0.5); /* Darker opaque background */
+}
+
+body.dark-mode .day-number {
+  color: #e0e0e0; /* Light text */
+}
+
+body.dark-mode .off-day .day-number {
+  color: #aaa; /* Lighter grey for off day numbers */
+}
+
+body.dark-mode .hours-summary {
+  color: #e0e0e0; /* Light text */
+}
+
+body.dark-mode .hours-summary h2 {
+  color: #e0e0e0; /* Light text */
+}
+
+body.dark-mode .hours-summary h3 {
+  color: #e0e0e0; /* Light text */
+}
+
+body.dark-mode .hours-summary p {
+  color: #e0e0e0; /* Light text */
+}
+
+body.dark-mode .hours-summary span {
+  color: #e0e0e0; /* Light text */
+}
+
+body.dark-mode td.highlight-day-shift span.day-number {
+  color: #ff6b6b; /* Lighter red */
+}
+
+body.dark-mode .tooltip {
+  background-color: #3a3a3a; /* Dark tooltip background */
+  color: #e0e0e0; /* Light text */
+  border-color: #555; /* Darker border */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5); /* Darker shadow */
+}
+
+body.dark-mode .tooltip-close-button {
+  color: #aaa; /* Lighter grey */
+}
+
+body.dark-mode .tooltip-close-button:hover {
+  color: #e0e0e0; /* Light text on hover */
+}
+
+body.dark-mode .day-input-wrapper {
+  border-color: #555; /* Darker border */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3); /* Darker shadow */
+}
+
+body.dark-mode .day-input-wrapper .control-day-input {
+  background-color: #3a3a3a; /* Dark input background */
+  color: #e0e0e0; /* Light text */
+}
+
+body.dark-mode .day-control-button {
+  background-color: #3a3a3a; /* Dark button background */
+  color: #e0e0e0; /* Light text */
+}
+
+body.dark-mode .day-control-button:hover {
+  background-color: #555; /* Darker on hover */
+}
+
+body.dark-mode .clear-button-icon {
+  background-color: #3a3a3a; /* Dark background */
+  border-color: #555; /* Darker border */
+  color: #e0e0e0; /* Light color for icon */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3); /* Darker shadow */
+}
+
+body.dark-mode .clear-button-icon svg path {
+  fill: #aaa; /* Lighter grey fill for icon paths */
+}
+
+body.dark-mode .clear-button-icon:hover {
+  background-color: #555; /* Darker on hover */
+  border-color: #666;
+}
+
+body.dark-mode .instruction-text {
+  color: #e0e0e0; /* Light text */
+}
+
 .controls {
   margin-bottom: 30px; /* Increased bottom margin */
   display: flex;
