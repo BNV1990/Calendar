@@ -24,59 +24,6 @@ body {
   position: relative; /* Added for absolute positioning of children */
 }
 
-/* ======== MOBILE STYLES (@media (max-width: 768px)) ======== */
-/* IMPORTANT: We are adjusting selectors but aiming to keep the visual output the same as your "good" mobile version. */
-
-@media (max-width: 768px) {
-  .container {
-    padding: 10px; /* Existing: Reduced padding for mobile .container */
-  }
-
-  .header-controls {
-    /* flex-direction: column; /* Already column from desktop, so it's fine */
-    /* gap: 10px; /* Existing: Vertical gap for mobile */
-    /* align-items: flex-end; /* Original: This aligned the whole block.
-                                Now child wrappers handle their content alignment.
-                                Set to stretch or default. */
-    align-items: stretch;
-    padding: 0 10px; /* Existing: L/R padding for header-controls on mobile */
-    /* margin-bottom: 20px; /* Keep default or adjust if mobile needs different spacing */
-  }
-
-  /* Mobile: Toggle wrapper needs to be second */
-  .header-controls__toggle-wrapper {
-    order: 2; /* Correct: Toggle below buttons on mobile */
-    width: 100%; /* Make wrapper full width within .header-controls padding */
-    justify-content: center; /* Center the .toggleContainer within this wrapper */
-    /* margin: 0 auto; /* Not needed here if width is 100% and parent handles padding */
-    /* align-self: center; /* From original, but justify-content:center on flex wrapper is better */
-  }
-
-  /* Mobile: Buttons wrapper needs to be first */
-  .header-controls__buttons-wrapper {
-    order: 1; /* Correct: Buttons above toggle on mobile */
-    width: 100%; /* Make wrapper full width */
-    justify-content: flex-end; /* Align buttons to the right */
-    /* gap: 10px; /* Already set from desktop, fine for mobile */
-    /* margin-top: 0; /* Handled by parent's gap */
-  }
-
-  /* Mobile styles for the .toggleContainer itself (from your existing CSS) */
-  .toggleContainer {
-    /* This rule makes the toggle slightly narrower than its full-width wrapper, creating side indents */
-    width: calc(100% - 40px) !important; /* Or ensure this means 20px indent from each side effectively */
-    margin: 0 auto; /* Center the toggle component */
-    /* max-width: 360px; /* REMOVE if you want it to be responsive based on calc() above */
-  }
-
-  .toggleButton {
-    /* Your existing mobile styles for .toggleButton are fine */
-    font-size: 12px;
-    padding: 0 2px;
-    min-width: unset;
-  }
-}
-
 /* Dark Mode Styles */
 body.dark-mode {
   background-color: #1a1a1a; /* Dark background */
@@ -202,7 +149,6 @@ body.dark-mode .hours-summary span {
   color: #e0e0e0; /* Light text */
 }
 
-
 body.dark-mode .tooltip {
   background-color: #3a3a3a; /* Dark tooltip background */
   color: #e0e0e0; /* Light text */
@@ -211,7 +157,12 @@ body.dark-mode .tooltip {
 }
 
 body.dark-mode .tooltip-close-button {
-  color: #aaa; /* Lighter grey */
+  background: none;
+  border: none;
+  color: #aaa;
+  cursor: pointer;
+  font-size: 1em;
+  padding: 0;
 }
 
 body.dark-mode .tooltip-close-button:hover {
@@ -234,22 +185,17 @@ body.dark-mode .instruction-text {
 
 .header-controls {
   display: flex;
-  flex-direction: row; /* Ключова зміна: елементи в один рядок */
-  justify-content: space-between; /* Розміщує повзунок зліва, кнопки справа */
-  align-items: center; /* Вертикальне вирівнювання по центру рядка */
-  margin-bottom: 20px; /* Відступ знизу перед блоком навігації календаря */
-  padding: 0; /* Зазвичай 0, якщо .container має власні відступи.
-                 Це розмістить елементи по краях контентної зони .container.
-                 Зображення показує, що елементи вирівняні по краях внутрішніх відступів картки.
-                 Ваш .container має padding: 30px, що добре. */
-  gap: 15px; /* Мінімальний простір між повзунком та кнопками, якщо вони стануть ближче */
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px; /* Збільшений відступ знизу для всього блоку */
+  width: 100%; /* Займає всю доступну ширину всередині .container (з урахуванням його padding) */
 }
 
 /* Обгортка для повзунка зміни (лівий елемент) */
 .header-controls__toggle-wrapper {
   display: flex; /* Для правильного вирівнювання, якщо сам повзунок має внутрішні відступи */
   align-items: center;
-  /* order не потрібен для десктопної версії в один рядок */
 }
 
 /* Обгортка для кнопок Зберегти/Оновити (правий елемент) */
@@ -257,7 +203,6 @@ body.dark-mode .instruction-text {
   display: flex;
   align-items: center;
   gap: 10px; /* Простір між кнопкою збереження та оновлення */
-  /* order не потрібен для десктопної версії в один рядок */
 }
 
 /* Стилі для іконки збереження (з вашого коду) */
@@ -586,54 +531,6 @@ body.dark-mode .instruction-text {
   justify-self: end; /* Align to the end of the grid cell */
 }
 
-/* ======== MOBILE STYLES (@media (max-width: 768px)) ======== */
-/* Ці стилі ПЕРЕВИЗНАЧАЮТЬ десктопні для мобільної версії */
-
-@media (max-width: 768px) {
-  .container {
-    padding: 10px; /* Існуючий стиль для мобільного .container */
-  }
-
-  .header-controls {
-    flex-direction: column; /* ПЕРЕВИЗНАЧЕННЯ: елементи в стовпчик */
-    align-items: stretch;   /* Дозволяє обгорткам займати повну ширину для контролю вирівнювання їх вмісту */
-    gap: 10px;             /* Вертикальний відступ між групою кнопок та повзунком */
-    padding: 0 10px;       /* Існуючі L/R відступи для .header-controls на мобільному */
-    /* justify-content: space-between; /* Не релевантно для flex-direction: column */
-  }
-
-  /* Мобільна версія: обгортка повзунка має бути другою (знизу) */
-  .header-controls__toggle-wrapper {
-    order: 2; /* Повзунок під кнопками */
-    width: 100%; /* Займає повну доступну ширину */
-    display: flex; /* Потрібно для застосування justify-content */
-    justify-content: center; /* Центрує сам компонент повзунка */
-  }
-
-  /* Мобільна версія: обгортка кнопок має бути першою (зверху) */
-  .header-controls__buttons-wrapper {
-    order: 1; /* Кнопки над повзунком */
-    width: 100%; /* Займає повну доступну ширину */
-    display: flex; /* Потрібно для застосування justify-content */
-    justify-content: flex-end; /* Вирівнює кнопки по правому краю */
-    /* gap: 10px; /* Вже встановлено для десктопу, підходить і для мобільного */
-  }
-
-  /* Існуючі мобільні стилі для самого .toggleContainer */
-  .toggleContainer {
-    width: calc(100% - 40px) !important; /* Робить повзунок трохи вужчим за повну ширину, створюючи відступи */
-    margin: 0 auto; /* Центрує його */
-    /* max-width: 360px; /* ВИДАЛІТЬ, якщо calc() є пріоритетним для адаптивності */
-  }
-
-  .toggleButton {
-    /* Ваші існуючі мобільні стилі для .toggleButton */
-    font-size: 12px;
-    padding: 0 2px;
-    min-width: unset; /* Дозволяє кнопкам звужуватися */
-  }
-}
-
 @media (max-width: 768px) {
   .hours-summary {
     display: none;
@@ -704,7 +601,6 @@ body.dark-mode .instruction-text {
   /* border-top: 1px solid #e0e0e0; */ /* Removed border-top */
   gap: 50px; /* Increased space between the two blocks */
 }
-
 
 /* Apply mobile hours summary styles to desktop */
 .hours-summary h3 {
@@ -823,63 +719,56 @@ body.dark-mode .instruction-text {
 /* Hide mobile summary on desktop */
 /* Removed redundant rule */
 
+/* ======== MOBILE STYLES (@media (max-width: 768px)) ======== */
 @media (max-width: 768px) {
-  /* Removed legend-desktop rule */
-
-  .legend {
-    display: flex; /* Show mobile legend on mobile */
-    justify-content: flex-start; /* Align items to the left */
-    gap: 15px; /* Space between legend items */
-    margin-top: 10px; /* Add some space above the legend */
-    flex-wrap: wrap; /* Allow items to wrap */
+  .container {
+    padding: 30px; /* Set mobile padding for container to match desktop (30px) */
   }
 
-  .legend-item {
+  .header-controls {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 30px; /* Increased gap between button block and toggle block on mobile */
+    padding: 0 10px;
+    margin-bottom: 20px;
+  }
+
+  .header-controls__toggle-wrapper {
+    order: 2;
+    width: 100%;
     display: flex;
-    align-items: center;
-    font-size: 0.9em; /* Slightly smaller font for mobile legend */
+    justify-content: center;
   }
 
-  .legend-item .legend-color {
-    width: 15px; /* Smaller color swatch on mobile */
-    height: 15px; /* Smaller color swatch on mobile */
-    margin-right: 5px; /* Reduced margin */
-  }
-
-  /* Hide hours summary on mobile */
-  .hours-summary {
-    display: none;
-  }
-
-  /* Hours summary mobile/desktop visibility */
-  /* Removed desktop view rule */
-
-  .monthly-summary-content.mobile-view {
-    display: flex; /* Show mobile hours summary on mobile */
-    justify-content: flex-end; /* Align items to the right */
-    gap: 15px; /* Space between summary items */
-    margin-top: 10px; /* Add some space above the summary */
-    flex-wrap: wrap; /* Allow items to wrap */
-    width: 100%; /* Take full width to allow right alignment */
-  }
-
-  .summary-item {
+  .header-controls__buttons-wrapper {
+    order: 1;
+    width: 100%;
     display: flex;
-    align-items: center;
-    font-size: 0.9em; /* Slightly smaller font for mobile summary */
+    justify-content: flex-end;
+  }
+
+  .toggleContainer {
+    width: calc(100% - 20px) !important;
+    margin: 0 auto;
+  }
+
+  .toggleButton {
+    font-size: 12px;
+    padding: 0 2px;
+    min-width: unset;
   }
 
   .summary-item svg {
-    margin-right: 5px; /* Space between icon and text */
+    margin-right: 5px;
   }
 
   .hours-summary-mobile {
-    max-height: none !important; /* Ensure mobile summary is always visible on mobile */
+    max-height: none !important;
     overflow: visible !important;
   }
 
   .hours-summary .accordion-content {
-    max-height: none !important; /* Ensure monthly summary content is always visible on mobile */
+    max-height: none !important;
     overflow: visible !important;
   }
 

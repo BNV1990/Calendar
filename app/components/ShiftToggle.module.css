@@ -47,9 +47,10 @@
 @media (max-width: 768px) {
   .toggleContainer {
     width: calc(100% - 40px) !important; /* 90% of parent width with 20px indents on each side */
+    max-width: 360px; /* Limit stretching to PC version width */
     margin: 0 auto; /* Center the toggle container */
     box-sizing: border-box; /* Include padding in width */
-    /* Removed max-width: 360px; */
+    gap: 5px; /* Add space between buttons */
   }
   .toggleSlider {
     width: calc(25% - 2px); /* Match desktop width calculation */
