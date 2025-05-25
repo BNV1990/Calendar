@@ -87,7 +87,6 @@ const UkrainianCalendar = () => {
   );
 
   const generateCalendarData = useCallback(() => {
-    console.log("generateCalendarData called. showHoursSummary:", showHoursSummary);
     if (!currentDate) return { rows: [], totalH: 0, dayH: 0, nightH: 0 }; // Return empty data if currentDate is null
     const year = currentDate.getFullYear();
     const month = currentDate.getMonth(); // 0-11
@@ -452,7 +451,6 @@ const UkrainianCalendar = () => {
           {/* New Clock Button (always visible) */}
           <div
             onClick={() => {
-              console.log("Toggling showHoursSummary from", showHoursSummary, "to", !showHoursSummary);
               setShowHoursSummary(!showHoursSummary);
             }}
             className="icon-button"
