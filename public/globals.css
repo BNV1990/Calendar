@@ -87,7 +87,8 @@ body.dark-mode .empty-cell {
 }
 
 body.dark-mode .today {
-  border-color: #a63737 !important; /* New border color for today in dark mode */
+  /* Removed border-color to use box-shadow instead */
+  box-shadow: inset 0 0 0 2px #a63737 !important; /* Simulate 2px border with box-shadow */
   /* Removed background-color to allow shift colors to show */
   /* Removed color to allow day-number to be black */
 }
@@ -392,7 +393,8 @@ body.dark-mode .instruction-text {
 
 .today {
   font-weight: bold;
-  border: 2px solid #a63737 !important; /* New border color for today */
+  /* Removed border to use box-shadow instead */
+  box-shadow: inset 0 0 0 2px #a63737 !important; /* Simulate 2px border with box-shadow */
   /* Removed background-color to allow shift colors to show */
 }
 
@@ -657,9 +659,7 @@ body.dark-mode .instruction-text {
     vertical-align: middle; /* Center content vertically */
   }
 
-  .today {
-    border-right-width: 2px !important; /* Ensure right border is 2px on mobile */
-  }
+  /* Removed specific border-right-width as box-shadow handles all sides */
 
   .legend-and-summary-container {
     grid-template-columns: 1fr; /* Stack legend and summary vertically */
