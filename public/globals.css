@@ -87,9 +87,13 @@ body.dark-mode .empty-cell {
 }
 
 body.dark-mode .today {
-  border-color: #0056b3; /* Darker blue border */
-  background-color: #3a3a3a; /* Darker background for today */
-  color: #e0e0e0; /* Light text */
+  border-color: #a63737 !important; /* New border color for today in dark mode */
+  /* Removed background-color to allow shift colors to show */
+  /* Removed color to allow day-number to be black */
+}
+
+body.dark-mode .today .day-number {
+  color: #a63737 !important; /* Make the day number same as border color in dark mode */
 }
 
 body.dark-mode .legend h3 {
@@ -221,7 +225,6 @@ body.dark-mode .instruction-text {
   align-items: center;
   gap: 10px; /* Простір між кнопкою збереження та оновлення */
 }
-
 
 /* Якщо AutorenewIcon потребує явних стилів для розміру/вигляду, додайте їх */
 /* Наприклад:
@@ -376,7 +379,7 @@ body.dark-mode .instruction-text {
 }
 
 .off-day {
-  background-color: #f8f9fa; /* Light background for off days */
+  background-color: #f8f9fa !important; /* Light background for off days */
 }
 
 .off-day .day-number {
@@ -389,8 +392,12 @@ body.dark-mode .instruction-text {
 
 .today {
   font-weight: bold;
-  border: 2px solid #007bff; /* Primary blue border */
-  background-color: #fdbeab; /* Very light blue background for today */
+  border: 2px solid #a63737 !important; /* New border color for today */
+  /* Removed background-color to allow shift colors to show */
+}
+
+.today .day-number {
+  color: #a63737 !important; /* Make the day number same as border color */
 }
 
 .legend {
@@ -436,7 +443,6 @@ body.dark-mode .instruction-text {
 .icon-button:hover svg {
   animation: jump 0.5s ease-in-out; /* Apply the animation */
 }
-
 
 /* Styles for the reset button */
 .reset-button {
@@ -773,7 +779,6 @@ body.dark-mode .instruction-text {
     justify-content: center;
     /* Visibility now controlled by .shift-toggle-wrapper and .shift-toggle-wrapper--hidden */
   }
-
 
   .header-controls__buttons-wrapper {
     order: 1;
