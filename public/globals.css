@@ -388,7 +388,7 @@ body.dark-mode .instruction-text {
 }
 
 .empty-cell {
-  background-color: #fefefe; /* Very light background for empty cells */
+  background-color: #f8f9fa; /* Very light background for empty cells */
 }
 
 .today {
@@ -504,7 +504,7 @@ body.dark-mode .instruction-text {
 }
 
 .off-day-legend {
-  background-color: #f8f9fa; /* Light background */
+  background-color: #ffffff; /* White background for off days in legend */
 }
 
 /* Remove unused style */

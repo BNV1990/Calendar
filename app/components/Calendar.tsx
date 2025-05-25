@@ -99,7 +99,9 @@ const Calendar: React.FC<CalendarProps> = ({
           </button>
           <h2 id="month-year-header">
             {currentDate
-              ? `${monthNames[currentDate.getMonth()]} ${currentDate.getFullYear()}`
+              ? `${
+                  monthNames[currentDate.getMonth()]
+                } ${currentDate.getFullYear()}`
               : ""}
           </h2>
           <button
