@@ -1,4 +1,4 @@
-const CACHE_NAME = 'calendar-cache-v2';
+const CACHE_NAME = 'calendar-cache-v3';
 const urlsToCache = [
   '/',
   '/globals.css',
@@ -18,8 +18,19 @@ self.addEventListener('install', event => {
   );
 });
 
-self.addEventListener('activate', () => {
-  clients.claim(); // контроль усіх вкладок
+self.addEventListener('activate', event => {
+  event.waitUntil(
+    caches.keys().then(cacheNames => {
+      return Promise.all(
+        cacheNames.map(cacheName => {
+          if (cacheName !== CACHE_NAME) {
+            console.log('Deleting old cache:', cacheName);
+            return caches.delete(cacheName);
+          }
+        })
+      );
+    }).then(() => clients.claim()) // контроль усіх вкладок
+  );
 });
 
 self.addEventListener('fetch', event => {
