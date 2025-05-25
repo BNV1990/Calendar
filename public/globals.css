@@ -657,6 +657,10 @@ body.dark-mode .instruction-text {
     vertical-align: middle; /* Center content vertically */
   }
 
+  .today {
+    border-right-width: 2px !important; /* Ensure right border is 2px on mobile */
+  }
+
   .legend-and-summary-container {
     grid-template-columns: 1fr; /* Stack legend and summary vertically */
     gap: 20px; /* Reduced gap */
