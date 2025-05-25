@@ -124,22 +124,22 @@ const Calendar: React.FC<CalendarProps> = ({
       </div>
 
       {/* Monthly Summary Mobile */}
-      {showHoursSummary && (
-        <div
-          className="monthly-summary-content mobile-view"
-          style={{ marginBottom: "20px" }}
-        >
-          <div className="summary-item">
-            <TbClockHour8 /> <span>{totalHours}</span>
-          </div>
-          <div className="summary-item">
-            <GoSun /> <span>{dayHours}</span>
-          </div>
-          <div className="summary-item">
-            <MdOutlineNightlight /> <span>{nightHours}</span>
-          </div>
+      <div
+        className={`monthly-summary-content mobile-view ${
+          showHoursSummary ? "hours-summary-visible" : "hours-summary-hidden"
+        }`}
+        style={{ marginBottom: "20px" }}
+      >
+        <div className="summary-item">
+          <TbClockHour8 /> <span>{totalHours}</span>
         </div>
-      )}
+        <div className="summary-item">
+          <GoSun /> <span>{dayHours}</span>
+        </div>
+        <div className="summary-item">
+          <MdOutlineNightlight /> <span>{nightHours}</span>
+        </div>
+      </div>
 
       <div className="calendar-table-container">
         <table id="calendar-table">

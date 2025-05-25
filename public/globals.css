@@ -730,11 +730,23 @@ body.dark-mode .instruction-text {
 
 /* Hours summary mobile/desktop visibility */
 .monthly-summary-content.mobile-view {
-  display: flex; /* Show mobile hours summary by default */
-  justify-content: flex-end; /* Align items to the right */
-  gap: 15px; /* Space between summary items */
-  flex-wrap: wrap; /* Allow items to wrap if needed */
-  width: 100%; /* Take full width to allow right alignment */
+  display: flex;
+  justify-content: flex-end;
+  gap: 15px;
+  flex-wrap: wrap;
+  width: 100%;
+  overflow: hidden; /* Hide overflowing content during transition */
+  transition: opacity 0.3s ease-in-out, max-height 0.3s ease-in-out;
+}
+
+.hours-summary-visible {
+  opacity: 1;
+  max-height: 100px; /* Adjust as needed to fit the content */
+}
+
+.hours-summary-hidden {
+  opacity: 0;
+  max-height: 0;
 }
 
 /* Hide mobile summary on desktop */
