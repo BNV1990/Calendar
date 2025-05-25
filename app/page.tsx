@@ -455,17 +455,9 @@ const UkrainianCalendar = () => {
               console.log("Toggling showHoursSummary from", showHoursSummary, "to", !showHoursSummary);
               setShowHoursSummary(!showHoursSummary);
             }}
+            className="icon-button"
             style={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              width: "40px",
-              height: "40px",
-              borderRadius: "6px",
               backgroundColor: showHoursSummary ? "#90c79e" : "#ffffff",
-              boxShadow: "0 2px 5px rgba(0, 0, 0, 0.05)",
-              cursor: "pointer",
-              transition: "all 0.2s ease-in-out",
               border: `1px solid ${showHoursSummary ? "#90c79e" : "#dcdcdc"}`,
             }}
           >
@@ -474,17 +466,9 @@ const UkrainianCalendar = () => {
           {/* PiUsersFourThin Button (now always visible) */}
           <div
             onClick={() => setShowShiftToggleMobile(!showShiftToggleMobile)}
+            className="icon-button"
             style={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              width: "40px",
-              height: "40px",
-              borderRadius: "6px",
               backgroundColor: showShiftToggleMobile ? "#90c79e" : "#ffffff",
-              boxShadow: "0 2px 5px rgba(0, 0, 0, 0.05)",
-              cursor: "pointer",
-              transition: "all 0.2s ease-in-out",
               border: `1px solid ${
                 showShiftToggleMobile ? "#90c79e" : "#dcdcdc"
               }`,
@@ -499,20 +483,11 @@ const UkrainianCalendar = () => {
           {/* Existing Save Button (always visible) */}
           <div
             onClick={saveShift}
+            className="icon-button"
             style={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              width: "40px",
-              height: "40px",
-              borderRadius: "6px",
               backgroundColor: isSaved ? "#90c79e" : "#ffffff",
-              boxShadow: "0 2px 5px rgba(0, 0, 0, 0.05)",
-              cursor: "pointer",
-              transition: "all 0.2s ease-in-out",
               border: `1px solid ${isSaved ? "#90c79e" : "#dcdcdc"}`,
             }}
-            className="save-icon"
           >
             <BsSave size={24} color={isSaved ? "#ffffff" : "#555"} />
           </div>

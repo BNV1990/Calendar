@@ -425,13 +425,8 @@ body.dark-mode .instruction-text {
   }
 }
 
-/* Apply jump animation on hover to the save icon's SVG */
-.save-icon:hover svg {
-  animation: jump 0.5s ease-in-out; /* Apply the animation */
-}
-
-/* Styles for the save icon */
-.save-icon {
+/* Reusable styles for icon buttons */
+.icon-button {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -441,6 +436,10 @@ body.dark-mode .instruction-text {
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
   cursor: pointer;
   transition: all 0.2s ease-in-out;
+}
+
+.icon-button:hover svg {
+  animation: jump 0.5s ease-in-out; /* Apply the animation */
 }
 
 
