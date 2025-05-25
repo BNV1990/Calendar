@@ -13,6 +13,7 @@ interface CalendarProps {
   totalHours: number;
   dayHours: number;
   nightHours: number;
+  showHoursSummary: boolean;
 }
 
 type AnimationDirection = "none" | "left" | "right";
@@ -26,6 +27,7 @@ const Calendar: React.FC<CalendarProps> = ({
   totalHours,
   dayHours,
   nightHours,
+  showHoursSummary,
 }) => {
   const [touchStartX, setTouchStartX] = useState(0);
   const [touchEndX, setTouchEndX] = useState(0);
@@ -122,20 +124,22 @@ const Calendar: React.FC<CalendarProps> = ({
       </div>
 
       {/* Monthly Summary Mobile */}
-      <div
-        className="monthly-summary-content mobile-view"
-        style={{ marginBottom: "20px" }}
-      >
-        <div className="summary-item">
-          <TbClockHour8 /> <span>{totalHours}</span>
+      {showHoursSummary && (
+        <div
+          className="monthly-summary-content mobile-view"
+          style={{ marginBottom: "20px" }}
+        >
+          <div className="summary-item">
+            <TbClockHour8 /> <span>{totalHours}</span>
+          </div>
+          <div className="summary-item">
+            <GoSun /> <span>{dayHours}</span>
+          </div>
+          <div className="summary-item">
+            <MdOutlineNightlight /> <span>{nightHours}</span>
+          </div>
         </div>
-        <div className="summary-item">
-          <GoSun /> <span>{dayHours}</span>
-        </div>
-        <div className="summary-item">
-          <MdOutlineNightlight /> <span>{nightHours}</span>
-        </div>
-      </div>
+      )}
 
       <div className="calendar-table-container">
         <table id="calendar-table">

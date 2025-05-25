@@ -65,13 +65,13 @@ body.dark-mode #calendar-table td {
 }
 
 body.dark-mode .day-shift {
-  background-color: #5a6268; /* Darker muted green */
-  color: #e0e0e0; /* Light text */
+  background-color: #5a6268 !important; /* Darker muted green */
+  color: #e0e0e0 !important; /* Light text */
 }
 
 body.dark-mode .night-shift {
-  background-color: #495057; /* Darker muted blue */
-  color: #e0e0e0; /* Light text */
+  background-color: #495057 !important; /* Darker muted blue */
+  color: #e0e0e0 !important; /* Light text */
 }
 
 body.dark-mode .off-day {
@@ -361,13 +361,13 @@ body.dark-mode .instruction-text {
 
 /* Класи для змін */
 .day-shift {
-  background-color: #edf3af; /* Muted green */
-  color: #155724; /* Dark green text */
+  background-color: #edf3af !important; /* Muted green */
+  color: #155724 !important; /* Dark green text */
 }
 
 .night-shift {
-  background-color: #96e7f5; /* Muted blue */
-  color: #0c5460; /* Dark blue text */
+  background-color: #96e7f5 !important; /* Muted blue */
+  color: #0c5460 !important; /* Dark blue text */
 }
 
 .off-day {
@@ -959,3 +959,7 @@ body.dark-mode .instruction-text {
 
 /* Accordion styles removed */
 /* Mobile-specific accordion styles removed */
+
+.hidden-hours {
+  display: none !important;
+}

@@ -6,6 +6,7 @@ import Calendar from "./components/Calendar";
 import AutorenewIcon from "./components/AutorenewIcon";
 import { BsSave } from "react-icons/bs";
 import { PiUsersFourThin } from "react-icons/pi"; // Import the new icon
+import { CiClock2 } from "react-icons/ci";
 import dynamic from "next/dynamic";
 
 const DynamicShiftToggle = dynamic(() => import("./components/ShiftToggle"), {
@@ -55,6 +56,7 @@ const UkrainianCalendar = () => {
   ); // New state to hold the saved day from localStorage
   const [isMobileView, setIsMobileView] = useState(false); // New state for mobile view detection
   const [showShiftToggleMobile, setShowShiftToggleMobile] = useState(false); // New state for mobile shift toggle visibility
+  const [showHoursSummary, setShowHoursSummary] = useState(true); // New state for hours summary visibility, default to true
 
   // State for hours summary
   const [totalHours, setTotalHours] = useState(0);
@@ -86,6 +88,7 @@ const UkrainianCalendar = () => {
   );
 
   const generateCalendarData = useCallback(() => {
+    console.log("generateCalendarData called. showHoursSummary:", showHoursSummary);
     if (!currentDate) return { rows: [], totalH: 0, dayH: 0, nightH: 0 }; // Return empty data if currentDate is null
     const year = currentDate.getFullYear();
     const month = currentDate.getMonth(); // 0-11
@@ -139,43 +142,50 @@ const UkrainianCalendar = () => {
               baseShiftInfo
             );
 
-            // Highlight the base shift day or the calculated first day shift in the current month
+            // Check if the current cell is the selected base shift day
             if (
-              (cellDate.getFullYear() === baseShiftInfo.year &&
-                cellDate.getMonth() === baseShiftInfo.month &&
-                cellDate.getDate() === baseShiftInfo.day) ||
-              (date === 1 && shiftTypeForCell === "D") // Highlight the 1st day if it's a Day shift in the current month
+              cellDate.getFullYear() === baseShiftInfo.year &&
+              cellDate.getMonth() === baseShiftInfo.month &&
+              cellDate.getDate() === baseShiftInfo.day
             ) {
-              cellClassName = "day-shift highlight-day-shift"; // Assuming the highlighted day is always a day shift
+              cellClassName = "day-shift highlight-day-shift";
               dayNumberStyle = { fontWeight: "bold" };
-            } else if (shiftTypeForCell === "D") {
-              cellClassName = "day-shift";
-            } else if (shiftTypeForCell === "N") {
-              cellClassName = "night-shift";
-            } else {
-              cellClassName = "off-day";
-            }
-
-            if (shiftTypeForCell === "D") {
-              hoursTextForThisCell = "+12";
+              hoursTextForThisCell = "+12"; // Always add +12 for the base shift day
               currentMonthDayHours += 12;
               currentMonthTotalHours += 12;
-            } else if (shiftTypeForCell === "N") {
-              hoursTextForThisCell = "+4";
-              currentMonthNightHours += 4;
-              currentMonthTotalHours += 4;
-            } else if (
-              (shiftTypeForCell === "O1" || shiftTypeForCell === "O2") &&
-              shiftTypeForPrevDay === "N"
-            ) {
-              hoursTextForThisCell = "+8";
-              currentMonthNightHours += 8;
-              currentMonthTotalHours += 8;
+            } else {
+              // For other days, apply shift logic based on calculated shiftTypeForCell
+              if (shiftTypeForCell === "D") {
+                cellClassName = "day-shift";
+                hoursTextForThisCell = "+12";
+                currentMonthDayHours += 12;
+                currentMonthTotalHours += 12;
+              } else if (shiftTypeForCell === "N") {
+                cellClassName = "night-shift";
+                hoursTextForThisCell = "+4";
+                currentMonthNightHours += 4;
+                currentMonthTotalHours += 4;
+              } else if (
+                (shiftTypeForCell === "O1" || shiftTypeForCell === "O2") &&
+                shiftTypeForPrevDay === "N"
+              ) {
+                hoursTextForThisCell = "+8";
+                currentMonthNightHours += 8;
+                currentMonthTotalHours += 8;
+              }
             }
 
             if (hoursTextForThisCell !== "") {
               hoursSpan = (
-                <span className="hours-indicator">{hoursTextForThisCell}</span>
+                <span
+                  className="hours-indicator"
+                  style={{
+                    display: showHoursSummary ? "inline-block" : "none",
+                    visibility: showHoursSummary ? "visible" : "hidden",
+                  }}
+                >
+                  {hoursTextForThisCell}
+                </span>
               );
             }
           } else {
@@ -211,7 +221,7 @@ const UkrainianCalendar = () => {
       dayH: currentMonthDayHours,
       nightH: currentMonthNightHours,
     };
-  }, [currentDate, baseShiftInfo, getShiftForDate]);
+  }, [currentDate, baseShiftInfo, getShiftForDate, showHoursSummary]); // showHoursSummary added here
 
   useEffect(() => {
     setIsClient(true); // Set to true once component mounts on client side
@@ -327,7 +337,7 @@ const UkrainianCalendar = () => {
     setBaseShiftInfo({
       year: selectedFixedBase.year,
       month: selectedFixedBase.month,
-      day: selectedFixedBase.day,
+      day: selectedFixedBase.day, // Corrected typo here
     });
 
     // Ensure we are on the current month if the view is not the current month
@@ -384,20 +394,14 @@ const UkrainianCalendar = () => {
           setSavedShiftBaseDay(null);
         }
       } else {
-        // Invalid saved day, default to Shift 1
+        // No saved shift, default to Shift 1
         targetShiftInfo = FIXED_SHIFT_BASE_DATES[0];
         targetVisualShiftIndex = 0;
-        localStorage.removeItem("savedBaseDay"); // Clear invalid saved day
-        setSavedShiftBaseDay(null);
       }
-    } else {
-      // No saved shift, default to Shift 1
-      targetShiftInfo = FIXED_SHIFT_BASE_DATES[0];
-      targetVisualShiftIndex = 0;
-    }
 
-    setBaseShiftInfo(targetShiftInfo);
-    setSelectedShiftIndex(targetVisualShiftIndex);
+      setBaseShiftInfo(targetShiftInfo);
+      setSelectedShiftIndex(targetVisualShiftIndex);
+    }
   };
 
   const prevMonth = () => {
@@ -426,13 +430,19 @@ const UkrainianCalendar = () => {
       setNightHours(nightH);
     }
     // Update selectedShiftIndex based on currentDate and baseShiftInfo
-  }, [generateCalendarData, currentDate, baseShiftInfo, getShiftForDate]);
+  }, [generateCalendarData, currentDate, baseShiftInfo, getShiftForDate]); // Removed showHoursSummary from here
 
   return (
     <div className="container">
       <div className="header-controls">
         {/* Wrapper for ShiftToggle - Conditionally rendered for mobile */}
-        <div className={`header-controls__toggle-wrapper ${isMobileView && showShiftToggleMobile ? 'show-mobile-toggle' : 'hide-mobile-toggle'}`}>
+        <div
+          className={`header-controls__toggle-wrapper ${
+            isMobileView && showShiftToggleMobile
+              ? "show-mobile-toggle"
+              : "hide-mobile-toggle"
+          }`}
+        >
           <DynamicShiftToggle
             selectedShiftIndex={selectedShiftIndex}
             onShiftChange={handleShiftChange}
@@ -441,7 +451,30 @@ const UkrainianCalendar = () => {
 
         {/* Wrapper for Save/Refresh buttons - Kept second in JSX structure */}
         <div className="header-controls__buttons-wrapper">
-          {/* New Mobile-Only Button (now first in order, conditionally rendered) */}
+          {/* New Clock Button (always visible) */}
+          <div
+            onClick={() => {
+              console.log("Toggling showHoursSummary from", showHoursSummary, "to", !showHoursSummary);
+              setShowHoursSummary(!showHoursSummary);
+            }}
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              width: "40px",
+              height: "40px",
+              borderRadius: "6px",
+              backgroundColor: showHoursSummary ? "#90c79e" : "#ffffff",
+              boxShadow: "0 2px 5px rgba(0, 0, 0, 0.05)",
+              cursor: "pointer",
+              transition: "all 0.2s ease-in-out",
+              border: `1px solid ${showHoursSummary ? "#90c79e" : "#dcdcdc"}`,
+            }}
+            className="mobile-shift-toggle-button"
+          >
+            <CiClock2 size={24} color={showHoursSummary ? "#ffffff" : "#555"} />
+          </div>
+          {/* Original Mobile-Only Button (conditionally rendered for mobile) */}
           {isMobileView && (
             <div
               onClick={() => setShowShiftToggleMobile(!showShiftToggleMobile)}
@@ -456,11 +489,16 @@ const UkrainianCalendar = () => {
                 boxShadow: "0 2px 5px rgba(0, 0, 0, 0.05)",
                 cursor: "pointer",
                 transition: "all 0.2s ease-in-out",
-                border: `1px solid ${showShiftToggleMobile ? "#90c79e" : "#dcdcdc"}`,
+                border: `1px solid ${
+                  showShiftToggleMobile ? "#90c79e" : "#dcdcdc"
+                }`,
               }}
               className="mobile-shift-toggle-button"
             >
-              <PiUsersFourThin size={24} color={showShiftToggleMobile ? "#ffffff" : "#555"} />
+              <PiUsersFourThin
+                size={24}
+                color={showShiftToggleMobile ? "#ffffff" : "#555"}
+              />
             </div>
           )}
 
@@ -498,6 +536,7 @@ const UkrainianCalendar = () => {
         totalHours={totalHours}
         dayHours={dayHours}
         nightHours={nightHours}
+        showHoursSummary={showHoursSummary}
       />
 
       <div className="instruction-and-legend-container">
