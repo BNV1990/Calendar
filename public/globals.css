@@ -339,7 +339,7 @@ body.dark-mode .instruction-text {
   border: 1px solid #e0e0e0; /* Lighter border */
   padding: 12px 5px; /* Adjusted padding */
   text-align: center;
-  height: 50px; /* Increased cell height */
+  height: 50px; /* Re-added fixed height for desktop */
   width: calc(100% / 7);
   font-size: 0.9em; /* Slightly smaller font for cell content */
   position: relative; /* For absolute positioning of hours */
@@ -637,9 +637,18 @@ body.dark-mode .instruction-text {
 @media (max-width: 600px) {
   #calendar-table th,
   #calendar-table td {
-    padding: 6px 1px; /* Further reduced padding */
+    padding: 6px 1px; /* Keep some padding */
     font-size: 0.7em; /* Smaller font */
     min-width: 35px; /* Minimum width for cells */
+    min-height: 35px; /* Minimum height for cells */
+    aspect-ratio: 1 / 1; /* Force square aspect ratio */
+    /* Revert flex properties that broke table layout */
+    /* display: flex; */
+    /* flex-direction: column; */
+    /* justify-content: center; */
+    /* align-items: center; */
+    box-sizing: border-box; /* Ensure padding is included in total dimensions */
+    vertical-align: middle; /* Center content vertically */
   }
 
   .legend-and-summary-container {
