@@ -46,10 +46,18 @@
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .toggleContainer {
-    width: 100%; /* Full width on smaller screens */
-    max-width: 360px; /* Keep max-width consistent with new width */
+    width: calc(100% - 40px) !important; /* 90% of parent width with 20px indents on each side */
+    margin: 0 auto; /* Center the toggle container */
+    box-sizing: border-box; /* Include padding in width */
+    /* Removed max-width: 360px; */
   }
   .toggleSlider {
-    width: calc(25% - 4px);
+    width: calc(25% - 2px); /* Match desktop width calculation */
+  }
+  .toggleButton {
+    flex-basis: 0; /* Ensure flex:1 distributes space equally */
+    font-size: 12px; /* Slightly smaller font */
+    padding: 0 2px; /* Reduced padding */
+    min-width: unset; /* Allow shrinking */
   }
 }

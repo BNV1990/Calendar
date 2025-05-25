@@ -24,33 +24,56 @@ body {
   position: relative; /* Added for absolute positioning of children */
 }
 
+/* ======== MOBILE STYLES (@media (max-width: 768px)) ======== */
+/* IMPORTANT: We are adjusting selectors but aiming to keep the visual output the same as your "good" mobile version. */
+
 @media (max-width: 768px) {
   .container {
-    padding: 10px; /* Reduced padding for mobile */
+    padding: 10px; /* Existing: Reduced padding for mobile .container */
   }
 
   .header-controls {
-    flex-direction: column; /* Stack items vertically */
-    align-items: flex-end; /* Align items to the right */
-    padding: 0 10px; /* Adjust padding */
-    gap: 10px; /* Add gap between stacked items */
+    /* flex-direction: column; /* Already column from desktop, so it's fine */
+    /* gap: 10px; /* Existing: Vertical gap for mobile */
+    /* align-items: flex-end; /* Original: This aligned the whole block.
+                                Now child wrappers handle their content alignment.
+                                Set to stretch or default. */
+    align-items: stretch;
+    padding: 0 10px; /* Existing: L/R padding for header-controls on mobile */
+    /* margin-bottom: 20px; /* Keep default or adjust if mobile needs different spacing */
   }
 
-  .header-controls > div:first-child { /* This is the ShiftToggle container */
-    order: 2; /* Place it second */
-    width: calc(100% - 20px); /* Full width minus padding */
-    margin: 0 auto; /* Center horizontally, remove bottom margin as gap handles it */
-    padding: 0 10px; /* Small left/right padding */
-    box-sizing: border-box; /* Include padding in width */
-    align-self: center; /* Center the toggle within the column */
+  /* Mobile: Toggle wrapper needs to be second */
+  .header-controls__toggle-wrapper {
+    order: 2; /* Correct: Toggle below buttons on mobile */
+    width: 100%; /* Make wrapper full width within .header-controls padding */
+    justify-content: center; /* Center the .toggleContainer within this wrapper */
+    /* margin: 0 auto; /* Not needed here if width is 100% and parent handles padding */
+    /* align-self: center; /* From original, but justify-content:center on flex wrapper is better */
   }
 
-  .header-controls > div:last-child { /* This is the Save/Refresh buttons container */
-    order: 1; /* Place it first */
-    width: 100%; /* Take full width */
-    display: flex; /* Make it a flex container */
+  /* Mobile: Buttons wrapper needs to be first */
+  .header-controls__buttons-wrapper {
+    order: 1; /* Correct: Buttons above toggle on mobile */
+    width: 100%; /* Make wrapper full width */
     justify-content: flex-end; /* Align buttons to the right */
-    margin-top: 0; /* Remove margin-top as gap handles it */
+    /* gap: 10px; /* Already set from desktop, fine for mobile */
+    /* margin-top: 0; /* Handled by parent's gap */
+  }
+
+  /* Mobile styles for the .toggleContainer itself (from your existing CSS) */
+  .toggleContainer {
+    /* This rule makes the toggle slightly narrower than its full-width wrapper, creating side indents */
+    width: calc(100% - 40px) !important; /* Or ensure this means 20px indent from each side effectively */
+    margin: 0 auto; /* Center the toggle component */
+    /* max-width: 360px; /* REMOVE if you want it to be responsive based on calc() above */
+  }
+
+  .toggleButton {
+    /* Your existing mobile styles for .toggleButton are fine */
+    font-size: 12px;
+    padding: 0 2px;
+    min-width: unset;
   }
 }
 
@@ -207,19 +230,99 @@ body.dark-mode .instruction-text {
   gap: 20px; /* Increased gap */
 }
 
-/* Styles for the header controls container */
+/* ======== DESKTOP STYLES (Поза @media запитом) ======== */
+
 .header-controls {
   display: flex;
-  justify-content: space-between; /* Distribute space between toggle and buttons */
-  align-items: center;
-  margin-bottom: 20px; /* Space below the header */
-  padding: 0 20px; /* Add some horizontal padding */
+  flex-direction: row; /* Ключова зміна: елементи в один рядок */
+  justify-content: space-between; /* Розміщує повзунок зліва, кнопки справа */
+  align-items: center; /* Вертикальне вирівнювання по центру рядка */
+  margin-bottom: 20px; /* Відступ знизу перед блоком навігації календаря */
+  padding: 0; /* Зазвичай 0, якщо .container має власні відступи.
+                 Це розмістить елементи по краях контентної зони .container.
+                 Зображення показує, що елементи вирівняні по краях внутрішніх відступів картки.
+                 Ваш .container має padding: 30px, що добре. */
+  gap: 15px; /* Мінімальний простір між повзунком та кнопками, якщо вони стануть ближче */
 }
 
-/* Styles for the header buttons wrapper */
-.header-buttons-wrapper {
+/* Обгортка для повзунка зміни (лівий елемент) */
+.header-controls__toggle-wrapper {
+  display: flex; /* Для правильного вирівнювання, якщо сам повзунок має внутрішні відступи */
+  align-items: center;
+  /* order не потрібен для десктопної версії в один рядок */
+}
+
+/* Обгортка для кнопок Зберегти/Оновити (правий елемент) */
+.header-controls__buttons-wrapper {
   display: flex;
-  /* No gap here, as AutorenewIcon will be pushed by margin-left: auto */
+  align-items: center;
+  gap: 10px; /* Простір між кнопкою збереження та оновлення */
+  /* order не потрібен для десктопної версії в один рядок */
+}
+
+/* Стилі для іконки збереження (з вашого коду) */
+.save-icon {
+  /* width: 40px; height: 40px; ... ваші існуючі стилі ... */
+  /* Переконайтеся, що розміри та вигляд кнопок відповідають зображенню */
+}
+
+/* Якщо AutorenewIcon потребує явних стилів для розміру/вигляду, додайте їх */
+/* Наприклад:
+.your-autorenew-icon-class {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #dcdcdc;
+  border-radius: 6px;
+  background-color: #ffffff;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  cursor: pointer;
+}
+*/
+
+/* Стилі для контейнера повзунка (з вашого коду) */
+.toggleContainer {
+  display: flex;
+  position: relative;
+  width: 360px; /* Або інша ширина, яка відповідає дизайну. Збільште, якщо текст не вміщується. */
+  height: 40px;
+  background-color: #f0f0f0;
+  border-radius: 20px; /* Як на зображенні */
+  overflow: hidden;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+.toggleButton {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: #555;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  z-index: 1;
+  transition: color 0.3s ease;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0 5px;
+  white-space: nowrap;
+  min-width: 90px; /* Щоб текст "Зміна X" вміщувався */
+}
+.toggleButton.active {
+  color: #fff;
+}
+.toggleSlider {
+  position: absolute;
+  top: 2px; /* Відступи для ефекту "втиснутості" */
+  left: 2px;
+  width: calc(25% - 2px); /* Динамічна ширина слайдера */
+  height: calc(100% - 4px); /* Висота слайдера з урахуванням відступів */
+  background-color: #92c6a0; /* Зелений колір, як на скріншоті */
+  border-radius: 16px; /* Радіус для слайдера, трохи менший за контейнер */
+  transition: transform 0.3s ease;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
 .calendar-header {
@@ -483,33 +586,51 @@ body.dark-mode .instruction-text {
   justify-self: end; /* Align to the end of the grid cell */
 }
 
+/* ======== MOBILE STYLES (@media (max-width: 768px)) ======== */
+/* Ці стилі ПЕРЕВИЗНАЧАЮТЬ десктопні для мобільної версії */
+
 @media (max-width: 768px) {
   .container {
-    padding: 10px; /* Reduced padding for mobile */
+    padding: 10px; /* Існуючий стиль для мобільного .container */
   }
 
   .header-controls {
-    flex-direction: column; /* Stack items vertically */
-    align-items: flex-end; /* Align items to the right */
-    padding: 0 10px; /* Adjust padding */
-    gap: 10px; /* Add gap between stacked items */
+    flex-direction: column; /* ПЕРЕВИЗНАЧЕННЯ: елементи в стовпчик */
+    align-items: stretch;   /* Дозволяє обгорткам займати повну ширину для контролю вирівнювання їх вмісту */
+    gap: 10px;             /* Вертикальний відступ між групою кнопок та повзунком */
+    padding: 0 10px;       /* Існуючі L/R відступи для .header-controls на мобільному */
+    /* justify-content: space-between; /* Не релевантно для flex-direction: column */
   }
 
-  .header-controls > div:first-child { /* This is the ShiftToggle container */
-    order: 2; /* Place it second */
-    width: calc(100% - 20px); /* Full width minus padding */
-    margin: 0 auto; /* Center horizontally, remove bottom margin as gap handles it */
-    padding: 0 10px; /* Small left/right padding */
-    box-sizing: border-box; /* Include padding in width */
-    align-self: center; /* Center the toggle within the column */
+  /* Мобільна версія: обгортка повзунка має бути другою (знизу) */
+  .header-controls__toggle-wrapper {
+    order: 2; /* Повзунок під кнопками */
+    width: 100%; /* Займає повну доступну ширину */
+    display: flex; /* Потрібно для застосування justify-content */
+    justify-content: center; /* Центрує сам компонент повзунка */
   }
 
-  .header-controls > div:last-child { /* This is the Save/Refresh buttons container */
-    order: 1; /* Place it first */
-    width: 100%; /* Take full width */
-    display: flex; /* Make it a flex container */
-    justify-content: flex-end; /* Align buttons to the right */
-    margin-top: 0; /* Remove margin-top as gap handles it */
+  /* Мобільна версія: обгортка кнопок має бути першою (зверху) */
+  .header-controls__buttons-wrapper {
+    order: 1; /* Кнопки над повзунком */
+    width: 100%; /* Займає повну доступну ширину */
+    display: flex; /* Потрібно для застосування justify-content */
+    justify-content: flex-end; /* Вирівнює кнопки по правому краю */
+    /* gap: 10px; /* Вже встановлено для десктопу, підходить і для мобільного */
+  }
+
+  /* Існуючі мобільні стилі для самого .toggleContainer */
+  .toggleContainer {
+    width: calc(100% - 40px) !important; /* Робить повзунок трохи вужчим за повну ширину, створюючи відступи */
+    margin: 0 auto; /* Центрує його */
+    /* max-width: 360px; /* ВИДАЛІТЬ, якщо calc() є пріоритетним для адаптивності */
+  }
+
+  .toggleButton {
+    /* Ваші існуючі мобільні стилі для .toggleButton */
+    font-size: 12px;
+    padding: 0 2px;
+    min-width: unset; /* Дозволяє кнопкам звужуватися */
   }
 }
 

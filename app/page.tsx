@@ -402,25 +402,20 @@ const UkrainianCalendar = () => {
 
   return (
     <div className="container">
-      <div
-        className="header-controls"
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          padding: "0 30px",
-        }}
-      >
-        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+      <div className="header-controls">
+        {/* Wrapper for ShiftToggle - Kept first in JSX structure */}
+        <div className="header-controls__toggle-wrapper">
           <DynamicShiftToggle
             selectedShiftIndex={selectedShiftIndex}
             onShiftChange={handleShiftChange}
           />
         </div>
 
-        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+        {/* Wrapper for Save/Refresh buttons - Kept second in JSX structure */}
+        <div className="header-controls__buttons-wrapper">
           <div
             onClick={saveShift}
+            // Keep inline styles for the save button itself as they are dynamic
             style={{
               display: "flex",
               justifyContent: "center",
@@ -434,7 +429,7 @@ const UkrainianCalendar = () => {
               transition: "all 0.2s ease-in-out",
               border: `1px solid ${isSaved ? "#90c79e" : "#dcdcdc"}`,
             }}
-            className="save-icon"
+            className="save-icon" // This class is already styled
           >
             <BsSave size={24} color={isSaved ? "#ffffff" : "#555"} />
           </div>
