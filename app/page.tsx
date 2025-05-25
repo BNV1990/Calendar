@@ -5,6 +5,7 @@ import Legend from "./components/Legend";
 import Calendar from "./components/Calendar";
 import AutorenewIcon from "./components/AutorenewIcon";
 import { BsSave } from "react-icons/bs";
+import { PiUsersFourThin } from "react-icons/pi"; // Import the new icon
 import dynamic from "next/dynamic";
 
 const DynamicShiftToggle = dynamic(() => import("./components/ShiftToggle"), {
@@ -52,6 +53,8 @@ const UkrainianCalendar = () => {
   const [savedShiftBaseDay, setSavedShiftBaseDay] = useState<string | null>(
     null
   ); // New state to hold the saved day from localStorage
+  const [isMobileView, setIsMobileView] = useState(false); // New state for mobile view detection
+  const [showShiftToggleMobile, setShowShiftToggleMobile] = useState(false); // New state for mobile shift toggle visibility
 
   // State for hours summary
   const [totalHours, setTotalHours] = useState(0);
@@ -214,6 +217,22 @@ const UkrainianCalendar = () => {
     setIsClient(true); // Set to true once component mounts on client side
     setCurrentDate(new Date()); // Set current date on client side
 
+    // Initial check for mobile view
+    const checkMobile = () => {
+      setIsMobileView(window.innerWidth <= 768); // Match CSS media query breakpoint
+    };
+
+    checkMobile(); // Set initial state
+
+    // Load showShiftToggleMobile state from localStorage
+    const savedToggleState = localStorage.getItem('showShiftToggleMobile');
+    if (savedToggleState !== null) {
+      setShowShiftToggleMobile(savedToggleState === 'true');
+    }
+
+    // Event listener for window resize
+    window.addEventListener("resize", checkMobile);
+
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker
         .register("/service-worker.js")
@@ -227,7 +246,17 @@ const UkrainianCalendar = () => {
           console.error("Service Worker registration failed:", error);
         });
     }
+
+    // Cleanup event listener on component unmount
+    return () => window.removeEventListener("resize", checkMobile);
   }, []); // Empty dependency array means this runs once on mount
+
+  // Effect to save showShiftToggleMobile state to localStorage whenever it changes
+  useEffect(() => {
+    if (isClient) { // Ensure localStorage is available
+      localStorage.setItem('showShiftToggleMobile', String(showShiftToggleMobile));
+    }
+  }, [showShiftToggleMobile, isClient]);
 
   useEffect(() => {
     if (isClient) {
@@ -322,7 +351,6 @@ const UkrainianCalendar = () => {
         // If not saved, save it
         localStorage.setItem("savedBaseDay", currentBaseDay);
         setSavedShiftBaseDay(currentBaseDay); // Update saved state
-
       }
     } else {
       alert("Немає робочої зміни для збереження.");
@@ -403,8 +431,8 @@ const UkrainianCalendar = () => {
   return (
     <div className="container">
       <div className="header-controls">
-        {/* Wrapper for ShiftToggle - Kept first in JSX structure */}
-        <div className="header-controls__toggle-wrapper">
+        {/* Wrapper for ShiftToggle - Conditionally rendered for mobile */}
+        <div className={`header-controls__toggle-wrapper ${isMobileView && showShiftToggleMobile ? 'show-mobile-toggle' : 'hide-mobile-toggle'}`}>
           <DynamicShiftToggle
             selectedShiftIndex={selectedShiftIndex}
             onShiftChange={handleShiftChange}
@@ -413,9 +441,32 @@ const UkrainianCalendar = () => {
 
         {/* Wrapper for Save/Refresh buttons - Kept second in JSX structure */}
         <div className="header-controls__buttons-wrapper">
+          {/* New Mobile-Only Button (now first in order, conditionally rendered) */}
+          {isMobileView && (
+            <div
+              onClick={() => setShowShiftToggleMobile(!showShiftToggleMobile)}
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                width: "40px",
+                height: "40px",
+                borderRadius: "6px",
+                backgroundColor: showShiftToggleMobile ? "#90c79e" : "#ffffff",
+                boxShadow: "0 2px 5px rgba(0, 0, 0, 0.05)",
+                cursor: "pointer",
+                transition: "all 0.2s ease-in-out",
+                border: `1px solid ${showShiftToggleMobile ? "#90c79e" : "#dcdcdc"}`,
+              }}
+              className="mobile-shift-toggle-button"
+            >
+              <PiUsersFourThin size={24} color={showShiftToggleMobile ? "#ffffff" : "#555"} />
+            </div>
+          )}
+
+          {/* Existing Save Button (now always visible) */}
           <div
             onClick={saveShift}
-            // Keep inline styles for the save button itself as they are dynamic
             style={{
               display: "flex",
               justifyContent: "center",
@@ -429,10 +480,11 @@ const UkrainianCalendar = () => {
               transition: "all 0.2s ease-in-out",
               border: `1px solid ${isSaved ? "#90c79e" : "#dcdcdc"}`,
             }}
-            className="save-icon" // This class is already styled
+            className="save-icon" // Removed hide-on-mobile class
           >
             <BsSave size={24} color={isSaved ? "#ffffff" : "#555"} />
           </div>
+
           <AutorenewIcon onClick={clearShift} />
         </div>
       </div>

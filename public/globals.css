@@ -190,12 +190,19 @@ body.dark-mode .instruction-text {
   align-items: center;
   margin-bottom: 30px; /* Збільшений відступ знизу для всього блоку */
   width: 100%; /* Займає всю доступну ширину всередині .container (з урахуванням його padding) */
+  padding: 0 30px; /* Додано горизонтальний відступ, щоб вирівняти з календарем */
+  box-sizing: border-box; /* Включити padding у загальну ширину */
 }
 
 /* Обгортка для повзунка зміни (лівий елемент) */
 .header-controls__toggle-wrapper {
   display: flex; /* Для правильного вирівнювання, якщо сам повзунок має внутрішні відступи */
   align-items: center;
+  /* Default to visible on desktop */
+  opacity: 1;
+  max-height: 100px; /* Sufficient height for the toggle */
+  overflow: hidden;
+  transition: opacity 0.3s ease-in-out, max-height 0.3s ease-in-out;
 }
 
 /* Обгортка для кнопок Зберегти/Оновити (правий елемент) */
@@ -424,6 +431,11 @@ body.dark-mode .instruction-text {
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
   cursor: pointer;
   transition: all 0.2s ease-in-out;
+}
+
+/* Styles for the mobile shift toggle button */
+.mobile-shift-toggle-button:hover svg {
+  animation: jump 0.5s ease-in-out; /* Apply the animation */
 }
 
 /* Styles for the reset button */
@@ -738,6 +750,20 @@ body.dark-mode .instruction-text {
     width: 100%;
     display: flex;
     justify-content: center;
+    /* Mobile specific: hidden by default, controlled by classes */
+    opacity: 0;
+    max-height: 0;
+    transition: opacity 0.3s ease-in-out, max-height 0.3s ease-in-out;
+  }
+
+  .header-controls__toggle-wrapper.show-mobile-toggle {
+    opacity: 1;
+    max-height: 100px; /* Adjust as needed to fit the content */
+  }
+
+  .header-controls__toggle-wrapper.hide-mobile-toggle {
+    opacity: 0;
+    max-height: 0;
   }
 
   .header-controls__buttons-wrapper {
@@ -924,13 +950,3 @@ body.dark-mode .instruction-text {
 
 /* Accordion styles removed */
 /* Mobile-specific accordion styles removed */
-
-.hide-on-mobile {
-  display: block; /* Show by default */
-}
-
-@media (max-width: 768px) {
-  .hide-on-mobile {
-    display: none; /* Hide on screens smaller than 768px */
-  }
-}
