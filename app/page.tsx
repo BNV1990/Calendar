@@ -49,7 +49,9 @@ const UkrainianCalendar = () => {
   const [calendarRows, setCalendarRows] = useState<React.JSX.Element[]>([]);
   const [isSaved, setIsSaved] = useState(false); // New state for save status
   const [isClient, setIsClient] = useState(false); // New state for client-side rendering
-  const [savedShiftBaseDay, setSavedShiftBaseDay] = useState<string | null>(null); // New state to hold the saved day from localStorage
+  const [savedShiftBaseDay, setSavedShiftBaseDay] = useState<string | null>(
+    null
+  ); // New state to hold the saved day from localStorage
 
   // State for hours summary
   const [totalHours, setTotalHours] = useState(0);
@@ -79,7 +81,6 @@ const UkrainianCalendar = () => {
     },
     []
   );
-
 
   const generateCalendarData = useCallback(() => {
     if (!currentDate) return { rows: [], totalH: 0, dayH: 0, nightH: 0 }; // Return empty data if currentDate is null
@@ -265,14 +266,21 @@ const UkrainianCalendar = () => {
 
   // New useEffect to manage isSaved state based on current selected shift and saved shift
   useEffect(() => {
-    if (baseShiftInfo && savedShiftBaseDay && currentDate) { // Add currentDate to dependencies
+    if (baseShiftInfo && savedShiftBaseDay && currentDate) {
+      // Add currentDate to dependencies
       // Calculate the effective shift index for the current baseShiftInfo.day
       const currentEffectiveShiftIndex =
-        ((currentDate.getDate() - baseShiftInfo.day) % SHIFT_CYCLE_VALUES.length + SHIFT_CYCLE_VALUES.length) % SHIFT_CYCLE_VALUES.length;
+        (((currentDate.getDate() - baseShiftInfo.day) %
+          SHIFT_CYCLE_VALUES.length) +
+          SHIFT_CYCLE_VALUES.length) %
+        SHIFT_CYCLE_VALUES.length;
 
       // Calculate the effective shift index for the savedShiftBaseDay
       const savedEffectiveShiftIndex =
-        ((currentDate.getDate() - parseInt(savedShiftBaseDay)) % SHIFT_CYCLE_VALUES.length + SHIFT_CYCLE_VALUES.length) % SHIFT_CYCLE_VALUES.length;
+        (((currentDate.getDate() - parseInt(savedShiftBaseDay)) %
+          SHIFT_CYCLE_VALUES.length) +
+          SHIFT_CYCLE_VALUES.length) %
+        SHIFT_CYCLE_VALUES.length;
 
       // Compare the effective shift indices
       setIsSaved(currentEffectiveShiftIndex === savedEffectiveShiftIndex);
@@ -332,7 +340,8 @@ const UkrainianCalendar = () => {
 
     if (savedDay) {
       const savedDayInt = parseInt(savedDay);
-      if (!isNaN(savedDayInt) && savedDayInt >= 1 && savedDayInt <= 4) { // Assuming days 1-4 correspond to shifts 1-4
+      if (!isNaN(savedDayInt) && savedDayInt >= 1 && savedDayInt <= 4) {
+        // Assuming days 1-4 correspond to shifts 1-4
         const foundIndex = FIXED_SHIFT_BASE_DATES.findIndex(
           (shift) => shift.day === savedDayInt
         );
@@ -380,7 +389,8 @@ const UkrainianCalendar = () => {
   };
 
   useEffect(() => {
-    if (currentDate) { // Only generate calendar data if currentDate is not null
+    if (currentDate) {
+      // Only generate calendar data if currentDate is not null
       const { rows, totalH, dayH, nightH } = generateCalendarData();
       setCalendarRows(rows);
       setTotalHours(totalH);
@@ -392,56 +402,56 @@ const UkrainianCalendar = () => {
 
   return (
     <div className="container">
-        <div
-          className="header-controls"
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            padding: "0 30px",
-          }}
-        >
-          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-            <DynamicShiftToggle
-              selectedShiftIndex={selectedShiftIndex}
-              onShiftChange={handleShiftChange}
-            />
-          </div>
-
-          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-            <div
-              onClick={saveShift}
-              style={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                width: "40px",
-                height: "40px",
-                borderRadius: "6px",
-                backgroundColor: isSaved ? "#90c79e" : "#ffffff",
-                boxShadow: "0 2px 5px rgba(0, 0, 0, 0.05)",
-                cursor: "pointer",
-                transition: "all 0.2s ease-in-out",
-                border: `1px solid ${isSaved ? "#90c79e" : "#dcdcdc"}`,
-              }}
-              className="save-icon"
-            >
-              <BsSave size={24} color={isSaved ? "#ffffff" : "#555"} />
-            </div>
-            <AutorenewIcon onClick={clearShift} />
-          </div>
+      <div
+        className="header-controls"
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          padding: "0 30px",
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+          <DynamicShiftToggle
+            selectedShiftIndex={selectedShiftIndex}
+            onShiftChange={handleShiftChange}
+          />
         </div>
 
-          <Calendar
-            calendarRows={calendarRows}
-            currentDate={currentDate}
-            monthNames={UKRAINIAN_MONTH_NAMES}
-            prevMonth={prevMonth}
-            nextMonth={nextMonth}
-            totalHours={totalHours}
-            dayHours={dayHours}
-            nightHours={nightHours}
-          />
+        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+          <div
+            onClick={saveShift}
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              width: "40px",
+              height: "40px",
+              borderRadius: "6px",
+              backgroundColor: isSaved ? "#90c79e" : "#ffffff",
+              boxShadow: "0 2px 5px rgba(0, 0, 0, 0.05)",
+              cursor: "pointer",
+              transition: "all 0.2s ease-in-out",
+              border: `1px solid ${isSaved ? "#90c79e" : "#dcdcdc"}`,
+            }}
+            className="save-icon"
+          >
+            <BsSave size={24} color={isSaved ? "#ffffff" : "#555"} />
+          </div>
+          <AutorenewIcon onClick={clearShift} />
+        </div>
+      </div>
+
+      <Calendar
+        calendarRows={calendarRows}
+        currentDate={currentDate}
+        monthNames={UKRAINIAN_MONTH_NAMES}
+        prevMonth={prevMonth}
+        nextMonth={nextMonth}
+        totalHours={totalHours}
+        dayHours={dayHours}
+        nightHours={nightHours}
+      />
 
       <div className="instruction-and-legend-container">
         <div

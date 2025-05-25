@@ -28,6 +28,30 @@ body {
   .container {
     padding: 10px; /* Reduced padding for mobile */
   }
+
+  .header-controls {
+    flex-direction: column; /* Stack items vertically */
+    align-items: flex-end; /* Align items to the right */
+    padding: 0 10px; /* Adjust padding */
+    gap: 10px; /* Add gap between stacked items */
+  }
+
+  .header-controls > div:first-child { /* This is the ShiftToggle container */
+    order: 2; /* Place it second */
+    width: calc(100% - 20px); /* Full width minus padding */
+    margin: 0 auto; /* Center horizontally, remove bottom margin as gap handles it */
+    padding: 0 10px; /* Small left/right padding */
+    box-sizing: border-box; /* Include padding in width */
+    align-self: center; /* Center the toggle within the column */
+  }
+
+  .header-controls > div:last-child { /* This is the Save/Refresh buttons container */
+    order: 1; /* Place it first */
+    width: 100%; /* Take full width */
+    display: flex; /* Make it a flex container */
+    justify-content: flex-end; /* Align buttons to the right */
+    margin-top: 0; /* Remove margin-top as gap handles it */
+  }
 }
 
 /* Dark Mode Styles */
@@ -460,8 +484,32 @@ body.dark-mode .instruction-text {
 }
 
 @media (max-width: 768px) {
-  .hours-summary {
-    display: none;
+  .container {
+    padding: 10px; /* Reduced padding for mobile */
+  }
+
+  .header-controls {
+    flex-direction: column; /* Stack items vertically */
+    align-items: flex-end; /* Align items to the right */
+    padding: 0 10px; /* Adjust padding */
+    gap: 10px; /* Add gap between stacked items */
+  }
+
+  .header-controls > div:first-child { /* This is the ShiftToggle container */
+    order: 2; /* Place it second */
+    width: calc(100% - 20px); /* Full width minus padding */
+    margin: 0 auto; /* Center horizontally, remove bottom margin as gap handles it */
+    padding: 0 10px; /* Small left/right padding */
+    box-sizing: border-box; /* Include padding in width */
+    align-self: center; /* Center the toggle within the column */
+  }
+
+  .header-controls > div:last-child { /* This is the Save/Refresh buttons container */
+    order: 1; /* Place it first */
+    width: 100%; /* Take full width */
+    display: flex; /* Make it a flex container */
+    justify-content: flex-end; /* Align buttons to the right */
+    margin-top: 0; /* Remove margin-top as gap handles it */
   }
 }
 
