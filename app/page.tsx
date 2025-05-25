@@ -54,9 +54,8 @@ const UkrainianCalendar = () => {
   const [savedShiftBaseDay, setSavedShiftBaseDay] = useState<string | null>(
     null
   ); // New state to hold the saved day from localStorage
-  const [isMobileView, setIsMobileView] = useState(false); // New state for mobile view detection
-  const [showShiftToggleMobile, setShowShiftToggleMobile] = useState(false); // New state for mobile shift toggle visibility
-  const [showHoursSummary, setShowHoursSummary] = useState(true); // New state for hours summary visibility, default to true
+  const [showShiftToggleMobile, setShowShiftToggleMobile] = useState(false); // State for shift toggle visibility
+  const [showHoursSummary, setShowHoursSummary] = useState(true); // State for hours summary visibility
 
   // State for hours summary
   const [totalHours, setTotalHours] = useState(0);
@@ -227,21 +226,17 @@ const UkrainianCalendar = () => {
     setIsClient(true); // Set to true once component mounts on client side
     setCurrentDate(new Date()); // Set current date on client side
 
-    // Initial check for mobile view
-    const checkMobile = () => {
-      setIsMobileView(window.innerWidth <= 768); // Match CSS media query breakpoint
-    };
-
-    checkMobile(); // Set initial state
-
     // Load showShiftToggleMobile state from localStorage
-    const savedToggleState = localStorage.getItem('showShiftToggleMobile');
-    if (savedToggleState !== null) {
-      setShowShiftToggleMobile(savedToggleState === 'true');
+    const savedShiftToggleState = localStorage.getItem('showShiftToggleMobile');
+    if (savedShiftToggleState !== null) {
+      setShowShiftToggleMobile(savedShiftToggleState === 'true');
     }
 
-    // Event listener for window resize
-    window.addEventListener("resize", checkMobile);
+    // Load showHoursSummary state from localStorage
+    const savedHoursSummaryState = localStorage.getItem('showHoursSummary');
+    if (savedHoursSummaryState !== null) {
+      setShowHoursSummary(savedHoursSummaryState === 'true');
+    }
 
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker
@@ -256,17 +251,20 @@ const UkrainianCalendar = () => {
           console.error("Service Worker registration failed:", error);
         });
     }
-
-    // Cleanup event listener on component unmount
-    return () => window.removeEventListener("resize", checkMobile);
   }, []); // Empty dependency array means this runs once on mount
 
-  // Effect to save showShiftToggleMobile state to localStorage whenever it changes
+  // Effects to save states to localStorage whenever they change
   useEffect(() => {
     if (isClient) { // Ensure localStorage is available
       localStorage.setItem('showShiftToggleMobile', String(showShiftToggleMobile));
     }
   }, [showShiftToggleMobile, isClient]);
+
+  useEffect(() => {
+    if (isClient) { // Ensure localStorage is available
+      localStorage.setItem('showHoursSummary', String(showHoursSummary));
+    }
+  }, [showHoursSummary, isClient]);
 
   useEffect(() => {
     if (isClient) {
@@ -435,12 +433,12 @@ const UkrainianCalendar = () => {
   return (
     <div className="container">
       <div className="header-controls">
-        {/* Wrapper for ShiftToggle - Conditionally rendered for mobile */}
+        {/* Wrapper for ShiftToggle */}
         <div
           className={`header-controls__toggle-wrapper ${
-            isMobileView && showShiftToggleMobile
-              ? "show-mobile-toggle"
-              : "hide-mobile-toggle"
+            showShiftToggleMobile
+              ? "shift-toggle-wrapper"
+              : "shift-toggle-wrapper--hidden"
           }`}
         >
           <DynamicShiftToggle
@@ -470,39 +468,35 @@ const UkrainianCalendar = () => {
               transition: "all 0.2s ease-in-out",
               border: `1px solid ${showHoursSummary ? "#90c79e" : "#dcdcdc"}`,
             }}
-            className="mobile-shift-toggle-button"
           >
             <CiClock2 size={24} color={showHoursSummary ? "#ffffff" : "#555"} />
           </div>
-          {/* Original Mobile-Only Button (conditionally rendered for mobile) */}
-          {isMobileView && (
-            <div
-              onClick={() => setShowShiftToggleMobile(!showShiftToggleMobile)}
-              style={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                width: "40px",
-                height: "40px",
-                borderRadius: "6px",
-                backgroundColor: showShiftToggleMobile ? "#90c79e" : "#ffffff",
-                boxShadow: "0 2px 5px rgba(0, 0, 0, 0.05)",
-                cursor: "pointer",
-                transition: "all 0.2s ease-in-out",
-                border: `1px solid ${
-                  showShiftToggleMobile ? "#90c79e" : "#dcdcdc"
-                }`,
-              }}
-              className="mobile-shift-toggle-button"
-            >
-              <PiUsersFourThin
-                size={24}
-                color={showShiftToggleMobile ? "#ffffff" : "#555"}
-              />
-            </div>
-          )}
+          {/* PiUsersFourThin Button (now always visible) */}
+          <div
+            onClick={() => setShowShiftToggleMobile(!showShiftToggleMobile)}
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              width: "40px",
+              height: "40px",
+              borderRadius: "6px",
+              backgroundColor: showShiftToggleMobile ? "#90c79e" : "#ffffff",
+              boxShadow: "0 2px 5px rgba(0, 0, 0, 0.05)",
+              cursor: "pointer",
+              transition: "all 0.2s ease-in-out",
+              border: `1px solid ${
+                showShiftToggleMobile ? "#90c79e" : "#dcdcdc"
+              }`,
+            }}
+          >
+            <PiUsersFourThin
+              size={24}
+              color={showShiftToggleMobile ? "#ffffff" : "#555"}
+            />
+          </div>
 
-          {/* Existing Save Button (now always visible) */}
+          {/* Existing Save Button (always visible) */}
           <div
             onClick={saveShift}
             style={{
@@ -518,7 +512,7 @@ const UkrainianCalendar = () => {
               transition: "all 0.2s ease-in-out",
               border: `1px solid ${isSaved ? "#90c79e" : "#dcdcdc"}`,
             }}
-            className="save-icon" // Removed hide-on-mobile class
+            className="save-icon"
           >
             <BsSave size={24} color={isSaved ? "#ffffff" : "#555"} />
           </div>

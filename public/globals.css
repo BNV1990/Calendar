@@ -205,6 +205,16 @@ body.dark-mode .instruction-text {
   transition: opacity 0.3s ease-in-out, max-height 0.3s ease-in-out;
 }
 
+.shift-toggle-wrapper {
+  opacity: 1;
+  max-height: 100px; /* Adjust as needed to fit the content */
+}
+
+.shift-toggle-wrapper--hidden {
+  opacity: 0;
+  max-height: 0;
+}
+
 /* Обгортка для кнопок Зберегти/Оновити (правий елемент) */
 .header-controls__buttons-wrapper {
   display: flex;
@@ -433,10 +443,6 @@ body.dark-mode .instruction-text {
   transition: all 0.2s ease-in-out;
 }
 
-/* Styles for the mobile shift toggle button */
-.mobile-shift-toggle-button:hover svg {
-  animation: jump 0.5s ease-in-out; /* Apply the animation */
-}
 
 /* Styles for the reset button */
 .reset-button {
@@ -759,21 +765,9 @@ body.dark-mode .instruction-text {
     width: 100%;
     display: flex;
     justify-content: center;
-    /* Mobile specific: hidden by default, controlled by classes */
-    opacity: 0;
-    max-height: 0;
-    transition: opacity 0.3s ease-in-out, max-height 0.3s ease-in-out;
+    /* Visibility now controlled by .shift-toggle-wrapper and .shift-toggle-wrapper--hidden */
   }
 
-  .header-controls__toggle-wrapper.show-mobile-toggle {
-    opacity: 1;
-    max-height: 100px; /* Adjust as needed to fit the content */
-  }
-
-  .header-controls__toggle-wrapper.hide-mobile-toggle {
-    opacity: 0;
-    max-height: 0;
-  }
 
   .header-controls__buttons-wrapper {
     order: 1;
