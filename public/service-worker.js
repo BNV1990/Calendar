@@ -8,6 +8,7 @@ const urlsToCache = [
 ];
 
 self.addEventListener('install', event => {
+  self.skipWaiting(); // негайна активація нового SW
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => {
@@ -15,6 +16,10 @@ self.addEventListener('install', event => {
         return cache.addAll(urlsToCache);
       })
   );
+});
+
+self.addEventListener('activate', () => {
+  clients.claim(); // контроль усіх вкладок
 });
 
 self.addEventListener('fetch', event => {
