@@ -6,7 +6,7 @@ import { MdOutlineNightlight } from "react-icons/md";
 
 interface CalendarProps {
   calendarRows: React.JSX.Element[];
-  currentDate: Date;
+  currentDate: Date | null; // Allow currentDate to be null
   monthNames: string[];
   prevMonth: () => void;
   nextMonth: () => void;
@@ -95,9 +95,11 @@ const Calendar: React.FC<CalendarProps> = ({
           >
             <FaCaretLeft /> <span className="button-text">Попередній</span>
           </button>
-          <h2 id="month-year-header">{`${
-            monthNames[currentDate.getMonth()]
-          } ${currentDate.getFullYear()}`}</h2>
+          <h2 id="month-year-header">
+            {currentDate
+              ? `${monthNames[currentDate.getMonth()]} ${currentDate.getFullYear()}`
+              : ""}
+          </h2>
           <button
             id="next-month-button"
             onTouchStart={(e) => {

@@ -21,6 +21,7 @@ body {
   width: 100%; /* Use full width on smaller screens */
   max-width: 750px; /* Slightly increased max-width */
   margin-top: 5px; /* Reduced margin top to 5px */
+  position: relative; /* Added for absolute positioning of children */
 }
 
 @media (max-width: 768px) {
@@ -42,36 +43,6 @@ body.dark-mode .container {
 
 body.dark-mode .control-main-label {
   color: #ff6b6b; /* Lighter red for dark mode */
-}
-
-body.dark-mode .control-day-input {
-  background-color: #3a3a3a; /* Dark input background */
-  border-color: #555; /* Darker border */
-  color: #e0e0e0; /* Light text */
-}
-
-body.dark-mode .control-day-input:focus {
-  border-color: #555; /* Keep dark border on focus */
-}
-
-body.dark-mode .control-buttons-wrapper button {
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3); /* Darker shadow */
-}
-
-body.dark-mode #apply-shift-button {
-  background-color: #0056b3; /* Darker blue */
-}
-
-body.dark-mode #apply-shift-button:hover {
-  background-color: #003f80;
-}
-
-body.dark-mode #clear-shift-button {
-  background-color: #5a6268; /* Darker grey */
-}
-
-body.dark-mode #clear-shift-button:hover {
-  background-color: #495057;
 }
 
 body.dark-mode .calendar-header button {
@@ -184,9 +155,6 @@ body.dark-mode .hours-summary span {
   color: #e0e0e0; /* Light text */
 }
 
-body.dark-mode td.highlight-day-shift span.day-number {
-  color: #ff6b6b; /* Lighter red */
-}
 
 body.dark-mode .tooltip {
   background-color: #3a3a3a; /* Dark tooltip background */
@@ -203,41 +171,6 @@ body.dark-mode .tooltip-close-button:hover {
   color: #e0e0e0; /* Light text on hover */
 }
 
-body.dark-mode .day-input-wrapper {
-  border-color: #555; /* Darker border */
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3); /* Darker shadow */
-}
-
-body.dark-mode .day-input-wrapper .control-day-input {
-  background-color: #3a3a3a; /* Dark input background */
-  color: #e0e0e0; /* Light text */
-}
-
-body.dark-mode .day-control-button {
-  background-color: #3a3a3a; /* Dark button background */
-  color: #e0e0e0; /* Light text */
-}
-
-body.dark-mode .day-control-button:hover {
-  background-color: #555; /* Darker on hover */
-}
-
-body.dark-mode .clear-button-icon {
-  background-color: #3a3a3a; /* Dark background */
-  border-color: #555; /* Darker border */
-  color: #e0e0e0; /* Light color for icon */
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3); /* Darker shadow */
-}
-
-body.dark-mode .clear-button-icon svg path {
-  fill: #aaa; /* Lighter grey fill for icon paths */
-}
-
-body.dark-mode .clear-button-icon:hover {
-  background-color: #555; /* Darker on hover */
-  border-color: #666;
-}
-
 body.dark-mode .instruction-text {
   color: #e0e0e0; /* Light text */
 }
@@ -250,75 +183,19 @@ body.dark-mode .instruction-text {
   gap: 20px; /* Increased gap */
 }
 
-/* Стиль для головного лейбла */
-.control-main-label {
-  color: red;
-  font-weight: bold;
-  font-size: 1.15em; /* Slightly larger font */
-  text-align: center;
-}
-
-/* Стиль для поля вводу дня */
-.control-day-input {
-  padding: 10px 15px; /* Adjusted padding */
-  border: 1px solid #dcdcdc; /* Lighter border */
-  border-radius: 6px; /* More rounded corners */
-  width: 80px; /* Adjusted width */
-  font-size: 1.1em; /* Adjusted font size */
-  text-align: center;
-  outline: none; /* Remove default outline */
-  transition: border-color 0.2s ease-in-out;
-}
-
-.control-day-input:focus {
-  outline: none; /* Remove default outline */
-  box-shadow: none; /* Remove box shadow on focus */
-  border-color: #dcdcdc; /* Keep the default border color on focus */
-}
-
-/* Контейнер для кнопок */
-.control-buttons-wrapper {
+/* Styles for the header controls container */
+.header-controls {
   display: flex;
-  gap: 15px; /* Increased gap */
-  justify-content: center;
-  flex-wrap: wrap; /* Allow buttons to wrap on smaller screens */
+  justify-content: space-between; /* Distribute space between toggle and buttons */
+  align-items: center;
+  margin-bottom: 20px; /* Space below the header */
+  padding: 0 20px; /* Add some horizontal padding */
 }
 
-/* Стилі для кнопок в .control-buttons-wrapper */
-.control-buttons-wrapper button {
-  padding: 10px 20px; /* Adjusted padding */
-  color: white;
-  border: none;
-  border-radius: 6px; /* More rounded corners */
-  cursor: pointer;
-  transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-  font-size: 1em;
-  font-weight: 500;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow */
-}
-
-#apply-shift-button {
-  background-color: #007bff; /* Primary blue */
-}
-
-#apply-shift-button:hover {
-  background-color: #0056b3;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-}
-
-#clear-shift-button {
-  background-color: #6c757d; /* Secondary grey */
-}
-
-#clear-shift-button:hover {
-  background-color: #5a6268;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-}
-
-.controls label[for="base-day-input"] {
-  color: red;
-  font-weight: bold;
-  margin-right: 0; /* Remove margin */
+/* Styles for the header buttons wrapper */
+.header-buttons-wrapper {
+  display: flex;
+  /* No gap here, as AutorenewIcon will be pushed by margin-left: auto */
 }
 
 .calendar-header {
@@ -464,18 +341,17 @@ body.dark-mode .instruction-text {
   animation: jump 0.5s ease-in-out; /* Apply the animation */
 }
 
-/* Styles for the save and reset buttons container */
-.save-reset-buttons-container {
-  display: flex;
-  justify-content: center; /* Center the buttons */
-  align-items: center;
-  margin-top: 20px; /* Add some space above the buttons */
-  gap: 10px; /* Space between the buttons */
-}
-
-/* Add margin to the save icon to match the autorenew icon spacing */
+/* Styles for the save icon */
 .save-icon {
-  margin-left: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 6px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
 }
 
 /* Styles for the reset button */
@@ -495,13 +371,6 @@ body.dark-mode .instruction-text {
 .reset-button:hover {
   background-color: #5a6268;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-}
-
-@media (max-width: 768px) {
-  .day-input-wrapper .control-day-input:focus {
-    outline: none;
-    box-shadow: none;
-  }
 }
 
 .legend h3 {
@@ -667,10 +536,6 @@ body.dark-mode .instruction-text {
   gap: 50px; /* Increased space between the two blocks */
 }
 
-td.highlight-day-shift span.day-number {
-  font-weight: bold;
-  color: red;
-}
 
 /* Apply mobile hours summary styles to desktop */
 .hours-summary h3 {
@@ -857,52 +722,6 @@ td.highlight-day-shift span.day-number {
 
 /* Styles for the tooltip */
 .tooltip {
-  .legend-mobile {
-    display: flex; /* Show mobile legend on mobile */
-    justify-content: flex-start; /* Align items to the left */
-    gap: 15px; /* Space between legend items */
-    margin-top: 10px; /* Add some space above the legend */
-    flex-wrap: wrap; /* Allow items to wrap */
-  }
-
-  .legend-item {
-    display: flex;
-    align-items: center;
-    font-size: 0.9em; /* Slightly smaller font for mobile legend */
-  }
-
-  .legend-item .legend-color {
-    width: 15px; /* Smaller color swatch on mobile */
-    height: 15px; /* Smaller color swatch on mobile */
-    margin-right: 5px; /* Reduced margin */
-  }
-
-  /* Hours summary mobile/desktop visibility */
-  .hours-summary-desktop {
-    display: none; /* Hide desktop hours summary on mobile */
-  }
-
-  .hours-summary-mobile {
-    display: flex; /* Show mobile hours summary on mobile */
-    justify-content: flex-start; /* Align items to the left */
-    gap: 15px; /* Space between summary items */
-    margin-top: 10px; /* Add some space above the summary */
-    flex-wrap: wrap; /* Allow items to wrap */
-  }
-
-  .summary-item {
-    display: flex;
-    align-items: center;
-    font-size: 0.9em; /* Slightly smaller font for mobile summary */
-  }
-
-  .summary-item svg {
-    margin-right: 5px; /* Space between icon and text */
-  }
-}
-
-/* Styles for the tooltip */
-.tooltip {
   position: absolute;
   bottom: 100%; /* Position above the button */
   left: 50%;
@@ -934,52 +753,12 @@ td.highlight-day-shift span.day-number {
   color: #777;
 }
 
-/* Styles for the day input wrapper */
-.day-input-wrapper {
+/* Styles for the input and clear button wrapper */
+.input-and-clear-wrapper {
   display: flex;
+  flex-direction: row;
   align-items: center;
-  border: 1px solid #dcdcdc; /* Match input border */
-  border-radius: 6px; /* Match input border radius */
-  overflow: hidden; /* Hide overflow from rounded corners */
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05); /* Subtle shadow */
-}
-
-/* Adjust input style within the wrapper */
-.day-input-wrapper .control-day-input {
-  border: none; /* Remove individual input border */
-  border-radius: 0; /* Remove individual input border radius */
-  padding: 10px 5px; /* Adjust padding */
-  width: 60px; /* Adjust width */
-  text-align: center;
-}
-
-/* Styles for the control buttons */
-.day-control-button {
-  background-color: #fff; /* White background */
-  color: #495057; /* Dark grey text */
-  border: none; /* Remove border */
-  padding: 10px 15px; /* Adjusted padding */
-  cursor: pointer;
-  transition: background-color 0.2s ease-in-out;
-  font-size: 1.1em;
-  font-weight: bold;
-  flex-shrink: 0; /* Prevent shrinking */
-  width: 40px; /* Fixed width for equal size */
-  text-align: center; /* Center the text/icon */
-}
-
-.day-control-button:hover {
-  background-color: #f0f0f0; /* Slightly darker on hover */
-}
-
-.day-control-button:first-child {
-  border-top-left-radius: 6px;
-  border-bottom-left-radius: 6px;
-}
-
-.day-control-button:last-child {
-  border-top-right-radius: 6px;
-  border-bottom-right-radius: 6px;
+  gap: 10px; /* Adjust gap between input wrapper and clear button */
 }
 
 /* Styles for the clear button icon */
@@ -994,7 +773,6 @@ td.highlight-day-shift span.day-number {
   justify-content: center;
   transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out,
     box-shadow 0.2s ease-in-out;
-  margin-left: 10px; /* Add margin to the left */
   height: 40px; /* Match day control button height */
   width: 40px; /* Make it square */
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05); /* Match input wrapper shadow */
@@ -1014,24 +792,6 @@ td.highlight-day-shift span.day-number {
 .clear-button-icon:hover {
   background-color: #f0f0f0; /* Slightly darker on hover */
   border-color: #ced4da;
-}
-
-/* Adjust day input wrapper to align items */
-.day-input-wrapper {
-  display: flex;
-  align-items: center;
-  border: 1px solid #dcdcdc; /* Match input border */
-  border-radius: 6px; /* Match input border radius */
-  overflow: hidden; /* Hide overflow from rounded corners */
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05); /* Subtle shadow */
-}
-
-/* Styles for the input and clear button wrapper */
-.input-and-clear-wrapper {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 10px; /* Adjust gap between input wrapper and clear button */
 }
 
 .autorenew-icon svg {

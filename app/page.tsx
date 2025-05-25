@@ -5,6 +5,11 @@ import Legend from "./components/Legend";
 import Calendar from "./components/Calendar";
 import AutorenewIcon from "./components/AutorenewIcon";
 import { BsSave } from "react-icons/bs";
+import dynamic from "next/dynamic";
+
+const DynamicShiftToggle = dynamic(() => import("./components/ShiftToggle"), {
+  ssr: false,
+});
 
 interface ShiftInfo {
   year: number;
@@ -29,20 +34,22 @@ const UKRAINIAN_MONTH_NAMES = [
   "Грудень",
 ];
 
+// Define fixed base dates for each shift (May 1, 2, 3, 4, 2025)
+const FIXED_SHIFT_BASE_DATES: ShiftInfo[] = [
+  { year: 2025, month: 4, day: 1 }, // Shift 1: May 1, 2025 (month is 0-indexed)
+  { year: 2025, month: 4, day: 2 }, // Shift 2: May 2, 2025
+  { year: 2025, month: 4, day: 3 }, // Shift 3: May 3, 2025
+  { year: 2025, month: 4, day: 4 }, // Shift 4: May 4, 2025
+];
+
 const UkrainianCalendar = () => {
-  const today = new Date();
-  const initialBaseShiftInfo = {
-    year: today.getFullYear(),
-    month: today.getMonth(),
-    day: 1,
-  };
-  const [currentDate, setCurrentDate] = useState(new Date());
-  const [baseShiftInfo, setBaseShiftInfo] = useState<ShiftInfo | null>(
-    initialBaseShiftInfo
-  ); // Initial state for 1st day
-  const [baseDayInput, setBaseDayInput] = useState("1"); // Initial value is "1"
+  const [currentDate, setCurrentDate] = useState<Date | null>(null);
+  const [baseShiftInfo, setBaseShiftInfo] = useState<ShiftInfo | null>(null); // Initialize to null to prevent hydration mismatch
+  const [selectedShiftIndex, setSelectedShiftIndex] = useState(0); // Initialize to 0, will be updated in useEffect
   const [calendarRows, setCalendarRows] = useState<React.JSX.Element[]>([]);
   const [isSaved, setIsSaved] = useState(false); // New state for save status
+  const [isClient, setIsClient] = useState(false); // New state for client-side rendering
+  const [savedShiftBaseDay, setSavedShiftBaseDay] = useState<string | null>(null); // New state to hold the saved day from localStorage
 
   // State for hours summary
   const [totalHours, setTotalHours] = useState(0);
@@ -71,31 +78,11 @@ const UkrainianCalendar = () => {
       return SHIFT_CYCLE_VALUES[cycleIndex];
     },
     []
-  ); // SHIFT_CYCLE_VALUES is a constant from outer scope, so it's stable.
-  // exhaustive-deps might suggest adding SHIFT_CYCLE_VALUES here; it's good practice: [SHIFT_CYCLE_VALUES]
-
-  // Helper function to find the first day shift in a given month
-  const findFirstDayShiftInMonth = useCallback(
-    (
-      year: number,
-      month: number,
-      currentBaseShiftInfo: ShiftInfo | null
-    ): number | null => {
-      if (!currentBaseShiftInfo) return null;
-
-      const daysInMonth = new Date(year, month + 1, 0).getDate();
-      for (let day = 1; day <= daysInMonth; day++) {
-        const date = new Date(year, month, day);
-        if (getShiftForDate(date, currentBaseShiftInfo) === "D") {
-          return day;
-        }
-      }
-      return null; // Should not happen if a base shift is set
-    },
-    [getShiftForDate]
   );
 
+
   const generateCalendarData = useCallback(() => {
+    if (!currentDate) return { rows: [], totalH: 0, dayH: 0, nightH: 0 }; // Return empty data if currentDate is null
     const year = currentDate.getFullYear();
     const month = currentDate.getMonth(); // 0-11
 
@@ -156,7 +143,7 @@ const UkrainianCalendar = () => {
               (date === 1 && shiftTypeForCell === "D") // Highlight the 1st day if it's a Day shift in the current month
             ) {
               cellClassName = "day-shift highlight-day-shift"; // Assuming the highlighted day is always a day shift
-              dayNumberStyle = { fontWeight: "bold", color: "red" };
+              dayNumberStyle = { fontWeight: "bold" };
             } else if (shiftTypeForCell === "D") {
               cellClassName = "day-shift";
             } else if (shiftTypeForCell === "N") {
@@ -190,7 +177,7 @@ const UkrainianCalendar = () => {
           } else {
             // If no base shift is set, highlight the 1st day of the current month
             if (date === 1) {
-              dayNumberStyle = { fontWeight: "bold", color: "red" };
+              dayNumberStyle = { fontWeight: "bold" };
             }
             cellClassName = "off-day"; // Default to off-day if no base shift is set
           }
@@ -220,9 +207,12 @@ const UkrainianCalendar = () => {
       dayH: currentMonthDayHours,
       nightH: currentMonthNightHours,
     };
-  }, [currentDate, baseShiftInfo, getShiftForDate]); // Corrected dependencies
+  }, [currentDate, baseShiftInfo, getShiftForDate]);
 
   useEffect(() => {
+    setIsClient(true); // Set to true once component mounts on client side
+    setCurrentDate(new Date()); // Set current date on client side
+
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker
         .register("/service-worker.js")
@@ -236,333 +226,222 @@ const UkrainianCalendar = () => {
           console.error("Service Worker registration failed:", error);
         });
     }
-
-    // Load saved base day from local storage on mount
-    const savedDay = localStorage.getItem("savedBaseDay");
-    if (savedDay) {
-      const day = parseInt(savedDay);
-      const today = new Date();
-      const currentYearVal = today.getFullYear();
-      const currentMonthVal = today.getMonth();
-      const daysInCurrentMonth = new Date(
-        currentYearVal,
-        currentMonthVal + 1,
-        0
-      ).getDate();
-
-      if (!isNaN(day) && day >= 1 && day <= daysInCurrentMonth) {
-        setBaseShiftInfo({
-          year: currentYearVal,
-          month: currentMonthVal,
-          day: day,
-        });
-        setBaseDayInput(savedDay);
-      }
-    }
   }, []); // Empty dependency array means this runs once on mount
 
-  // Load saved base day from local storage after mount
   useEffect(() => {
-    const savedDay = localStorage.getItem("savedBaseDay");
-    if (savedDay) {
-      const day = parseInt(savedDay);
-      const today = new Date();
-      const currentYearVal = today.getFullYear();
-      const currentMonthVal = today.getMonth();
-      const daysInCurrentMonth = new Date(
-        currentYearVal,
-        currentMonthVal + 1,
-        0
-      ).getDate();
+    if (isClient) {
+      setSavedShiftBaseDay(localStorage.getItem("savedBaseDay")); // Set the saved day state
 
-      if (!isNaN(day) && day >= 1 && day <= daysInCurrentMonth) {
-        setBaseShiftInfo({
-          year: currentYearVal,
-          month: currentMonthVal,
-          day: day,
-        });
-        setBaseDayInput(savedDay);
-        setIsSaved(true); // Set isSaved to true if saved day is found
+      let targetShiftInfo: ShiftInfo;
+      let targetVisualShiftIndex: number;
+
+      const savedDay = localStorage.getItem("savedBaseDay");
+      if (savedDay) {
+        const savedDayInt = parseInt(savedDay);
+        const foundIndex = FIXED_SHIFT_BASE_DATES.findIndex(
+          (shift) => shift.day === savedDayInt
+        );
+
+        if (foundIndex !== -1) {
+          targetShiftInfo = FIXED_SHIFT_BASE_DATES[foundIndex];
+          targetVisualShiftIndex = foundIndex;
+        } else {
+          // If saved day is invalid or doesn't match a fixed base date, default to Shift 1
+          targetShiftInfo = FIXED_SHIFT_BASE_DATES[0];
+          targetVisualShiftIndex = 0;
+          localStorage.removeItem("savedBaseDay"); // Clear invalid saved day
+          setSavedShiftBaseDay(null);
+        }
+      } else {
+        // No saved shift, default to Shift 1
+        targetShiftInfo = FIXED_SHIFT_BASE_DATES[0];
+        targetVisualShiftIndex = 0;
       }
+
+      setBaseShiftInfo(targetShiftInfo);
+      setSelectedShiftIndex(targetVisualShiftIndex);
     }
-  }, []); // Empty dependency array means this runs once on mount
+  }, [isClient]); // Run this effect when isClient changes to true
 
-  const applyShift = (day: number) => {
-    const today = new Date(); // Get current date
-    const currentYearVal = today.getFullYear(); // Use current year
-    const currentMonthVal = today.getMonth(); // Use current month
-    const daysInCurrentMonth = new Date(
-      currentYearVal,
-      currentMonthVal + 1,
-      0
-    ).getDate();
+  // New useEffect to manage isSaved state based on current selected shift and saved shift
+  useEffect(() => {
+    if (baseShiftInfo && savedShiftBaseDay && currentDate) { // Add currentDate to dependencies
+      // Calculate the effective shift index for the current baseShiftInfo.day
+      const currentEffectiveShiftIndex =
+        ((currentDate.getDate() - baseShiftInfo.day) % SHIFT_CYCLE_VALUES.length + SHIFT_CYCLE_VALUES.length) % SHIFT_CYCLE_VALUES.length;
 
-    if (isNaN(day) || day < 1 || day > daysInCurrentMonth) {
-      alert(
-        `Будь ласка, введіть коректний день місяця (1-${daysInCurrentMonth}) для ${UKRAINIAN_MONTH_NAMES[currentMonthVal]} ${currentYearVal}.`
-      );
-      return;
+      // Calculate the effective shift index for the savedShiftBaseDay
+      const savedEffectiveShiftIndex =
+        ((currentDate.getDate() - parseInt(savedShiftBaseDay)) % SHIFT_CYCLE_VALUES.length + SHIFT_CYCLE_VALUES.length) % SHIFT_CYCLE_VALUES.length;
+
+      // Compare the effective shift indices
+      setIsSaved(currentEffectiveShiftIndex === savedEffectiveShiftIndex);
+    } else {
+      setIsSaved(false); // No base shift info or no saved day
     }
+  }, [baseShiftInfo, savedShiftBaseDay, currentDate]); // Depend on currentDate as well
 
-    // Set baseShiftInfo using the current month and year
+  const handleShiftChange = (newShiftIndex: number) => {
+    setSelectedShiftIndex(newShiftIndex); // Keep the visual selection correct
+
+    // Use the fixed base date for the selected shift
+    const selectedFixedBase = FIXED_SHIFT_BASE_DATES[newShiftIndex];
+
     setBaseShiftInfo({
-      year: currentYearVal,
-      month: currentMonthVal,
-      day: day,
+      year: selectedFixedBase.year,
+      month: selectedFixedBase.month,
+      day: selectedFixedBase.day,
     });
 
-    // If the current view is not the current month, navigate to the current month
+    // Ensure we are on the current month if the view is not the current month
+    const today = new Date();
     if (
-      currentDate.getMonth() !== currentMonthVal ||
-      currentDate.getFullYear() !== currentYearVal
+      currentDate &&
+      (currentDate.getMonth() !== today.getMonth() ||
+        currentDate.getFullYear() !== today.getFullYear())
     ) {
       setCurrentDate(new Date());
     }
   };
 
-  const incrementDay = () => {
-    const day = parseInt(baseDayInput);
-    const currentMonthVal = new Date().getMonth();
-    const currentYearVal = new Date().getFullYear();
-    const daysInCurrentMonth = new Date(
-      currentYearVal,
-      currentMonthVal + 1,
-      0
-    ).getDate();
-    if (!isNaN(day) && day < daysInCurrentMonth) {
-      const newDay = day + 1;
-      setBaseDayInput(newDay.toString());
-      applyShift(newDay); // Added direct call with new day
-    } else if (isNaN(day)) {
-      setBaseDayInput("1");
-      applyShift(1); // Added direct call with new day
-    }
-  };
-
-  const decrementDay = () => {
-    const day = parseInt(baseDayInput);
-    if (!isNaN(day) && day > 1) {
-      const newDay = day - 1;
-      setBaseDayInput(newDay.toString());
-      applyShift(newDay); // Added direct call with new day
-    } else if (isNaN(day)) {
-      setBaseDayInput("1");
-      applyShift(1); // Added direct call with new day
-    }
-  };
-
   const saveShift = () => {
-    if (isSaved) {
-      // If currently saved, unsave it
-      localStorage.removeItem("savedBaseDay");
-      setIsSaved(false);
-      alert("Зберігання робочої зміни скасовано!");
-    } else {
-      // If not saved, save it
-      if (baseShiftInfo) {
-        localStorage.setItem("savedBaseDay", baseShiftInfo.day.toString());
-        setIsSaved(true);
-        alert("Робоча зміна збережена!");
+    if (baseShiftInfo) {
+      const currentBaseDay = baseShiftInfo.day.toString();
+      if (savedShiftBaseDay === currentBaseDay) {
+        // If currently saved, do nothing (make button "inactive" in terms of action)
+        // No alert, no localStorage.removeItem
       } else {
-        alert("Немає робочої зміни для збереження.");
+        // If not saved, save it
+        localStorage.setItem("savedBaseDay", currentBaseDay);
+        setSavedShiftBaseDay(currentBaseDay); // Update saved state
+        alert("Робоча зміна збережена!");
       }
+    } else {
+      alert("Немає робочої зміни для збереження.");
     }
   };
 
-  // Modify clearShift to reset the base day to the saved day or 1st and navigate to the current month
   const clearShift = () => {
-    const today = new Date();
-    const currentYearVal = today.getFullYear();
-    const currentMonthVal = today.getMonth();
-    const daysInCurrentMonth = new Date(
-      currentYearVal,
-      currentMonthVal + 1,
-      0
-    ).getDate();
+    // 1. Return to the current month
+    setCurrentDate(new Date());
 
+    // 2. Set the shift slider to the shift saved in localStorage
     const savedDay = localStorage.getItem("savedBaseDay");
-    let dayToSet = 1; // Default to 1
+    let targetShiftInfo: ShiftInfo;
+    let targetVisualShiftIndex: number;
 
     if (savedDay) {
-      const parsedSavedDay = parseInt(savedDay);
-      // Check if the saved day is valid for the current month
-      if (
-        !isNaN(parsedSavedDay) &&
-        parsedSavedDay >= 1 &&
-        parsedSavedDay <= daysInCurrentMonth
-      ) {
-        dayToSet = parsedSavedDay;
+      const savedDayInt = parseInt(savedDay);
+      if (!isNaN(savedDayInt) && savedDayInt >= 1 && savedDayInt <= 4) { // Assuming days 1-4 correspond to shifts 1-4
+        const foundIndex = FIXED_SHIFT_BASE_DATES.findIndex(
+          (shift) => shift.day === savedDayInt
+        );
+        if (foundIndex !== -1) {
+          targetShiftInfo = FIXED_SHIFT_BASE_DATES[foundIndex];
+          targetVisualShiftIndex = foundIndex; // Assuming visual index matches array index
+        } else {
+          // Fallback to Shift 1 if saved day doesn't match a fixed base date
+          targetShiftInfo = FIXED_SHIFT_BASE_DATES[0];
+          targetVisualShiftIndex = 0;
+          localStorage.removeItem("savedBaseDay"); // Clear invalid saved day
+          setSavedShiftBaseDay(null);
+        }
       } else {
-        // If saved day is invalid, remove it from local storage
-        localStorage.removeItem("savedBaseDay");
+        // Invalid saved day, default to Shift 1
+        targetShiftInfo = FIXED_SHIFT_BASE_DATES[0];
+        targetVisualShiftIndex = 0;
+        localStorage.removeItem("savedBaseDay"); // Clear invalid saved day
+        setSavedShiftBaseDay(null);
       }
+    } else {
+      // No saved shift, default to Shift 1
+      targetShiftInfo = FIXED_SHIFT_BASE_DATES[0];
+      targetVisualShiftIndex = 0;
     }
 
-    setBaseShiftInfo({
-      year: currentYearVal,
-      month: currentMonthVal,
-      day: dayToSet,
-    });
-    setBaseDayInput(dayToSet.toString());
-    setCurrentDate(new Date()); // Navigate to current month
-    // Removed alert
+    setBaseShiftInfo(targetShiftInfo);
+    setSelectedShiftIndex(targetVisualShiftIndex);
   };
 
   const prevMonth = () => {
     setCurrentDate((prevDate) => {
-      const newDate = new Date(prevDate);
+      const newDate = prevDate ? new Date(prevDate) : new Date();
       newDate.setMonth(newDate.getMonth() - 1);
-
-      // Find the first day shift in the new month
-      if (baseShiftInfo) {
-        const firstDay = findFirstDayShiftInMonth(
-          newDate.getFullYear(),
-          newDate.getMonth(),
-          baseShiftInfo
-        );
-        if (firstDay !== null) {
-          setBaseShiftInfo({
-            year: newDate.getFullYear(),
-            month: newDate.getMonth(),
-            day: firstDay,
-          });
-          setBaseDayInput(firstDay.toString());
-        } else {
-          // If no day shift found in the new month, reset to day 1
-          setBaseShiftInfo({
-            year: newDate.getFullYear(),
-            month: newDate.getMonth(),
-            day: 1,
-          });
-          setBaseDayInput("1");
-        }
-      } else {
-        // If no base shift is set, reset to day 1 for the new month
-        setBaseShiftInfo({
-          year: newDate.getFullYear(),
-          month: newDate.getMonth(),
-          day: 1,
-        });
-        setBaseDayInput("1");
-      }
-
       return newDate;
     });
   };
 
   const nextMonth = () => {
     setCurrentDate((prevDate) => {
-      const newDate = new Date(prevDate);
+      const newDate = prevDate ? new Date(prevDate) : new Date();
       newDate.setMonth(newDate.getMonth() + 1);
-
-      // Find the first day shift in the new month
-      if (baseShiftInfo) {
-        const firstDay = findFirstDayShiftInMonth(
-          newDate.getFullYear(),
-          newDate.getMonth(),
-          baseShiftInfo
-        );
-        if (firstDay !== null) {
-          setBaseShiftInfo({
-            year: newDate.getFullYear(),
-            month: newDate.getMonth(),
-            day: firstDay,
-          });
-          setBaseDayInput(firstDay.toString());
-        } else {
-          // If no day shift found in the new month, reset to day 1
-          setBaseShiftInfo({
-            year: newDate.getFullYear(),
-            month: newDate.getMonth(),
-            day: 1,
-          });
-          setBaseDayInput("1");
-        }
-      } else {
-        // If no base shift is set, reset to day 1 for the new month
-        setBaseShiftInfo({
-          year: newDate.getFullYear(),
-          month: newDate.getMonth(),
-          day: 1,
-        });
-        setBaseDayInput("1");
-      }
-
       return newDate;
     });
   };
 
   useEffect(() => {
-    const { rows, totalH, dayH, nightH } = generateCalendarData();
-    setCalendarRows(rows);
-    setTotalHours(totalH);
-    setDayHours(dayH);
-    setNightHours(nightH);
-  }, [generateCalendarData]);
+    if (currentDate) { // Only generate calendar data if currentDate is not null
+      const { rows, totalH, dayH, nightH } = generateCalendarData();
+      setCalendarRows(rows);
+      setTotalHours(totalH);
+      setDayHours(dayH);
+      setNightHours(nightH);
+    }
+    // Update selectedShiftIndex based on currentDate and baseShiftInfo
+  }, [generateCalendarData, currentDate, baseShiftInfo, getShiftForDate]);
 
   return (
     <div className="container">
-      <h1>Календар робочих змін</h1>
-
-      <div className="controls">
-        <div className="input-and-clear-wrapper">
-          {" "}
-          {/* New wrapper */}
-          {/* Save Icon (moved from below) */}
-          <div
-            onClick={saveShift}
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              width: "40px", // Match input height
-              height: "40px", // Match input height
-              borderRadius: "6px", // Match input border radius
-              backgroundColor: isSaved ? "#90c79e" : "#ffffff", // Green if saved, white otherwise
-              boxShadow: "0 2px 5px rgba(0, 0, 0, 0.05)", // Match input wrapper shadow
-              cursor: "pointer",
-              transition: "all 0.2s ease-in-out",
-              border: `1px solid ${isSaved ? "#90c79e" : "#dcdcdc"}`, // Green border if saved
-            }}
-            className="save-icon"
-          >
-            <BsSave size={24} color={isSaved ? "#ffffff" : "#555"} />{" "}
-            {/* White icon if saved */}
-          </div>
-          <div className="day-input-wrapper">
-            {" "}
-            {/* Wrapper for input and buttons */}
-            <button onClick={decrementDay} className="day-control-button">
-              -
-            </button>
-            <input
-              type="number"
-              id="base-day-input"
-              min="1"
-              max="31"
-              className="control-day-input"
-              value={baseDayInput}
-              readOnly
+        <div
+          className="header-controls"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            padding: "0 30px",
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            <DynamicShiftToggle
+              selectedShiftIndex={selectedShiftIndex}
+              onShiftChange={handleShiftChange}
             />
-            <button onClick={incrementDay} className="day-control-button">
-              +
-            </button>
           </div>
-          <AutorenewIcon onClick={clearShift} />
-        </div>{" "}
-        {/* End of new wrapper */}
-      </div>
 
-      <Calendar
-        calendarRows={calendarRows}
-        currentDate={currentDate}
-        monthNames={UKRAINIAN_MONTH_NAMES}
-        prevMonth={prevMonth}
-        nextMonth={nextMonth}
-        totalHours={totalHours}
-        dayHours={dayHours}
-        nightHours={nightHours}
-      />
+          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            <div
+              onClick={saveShift}
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                width: "40px",
+                height: "40px",
+                borderRadius: "6px",
+                backgroundColor: isSaved ? "#90c79e" : "#ffffff",
+                boxShadow: "0 2px 5px rgba(0, 0, 0, 0.05)",
+                cursor: "pointer",
+                transition: "all 0.2s ease-in-out",
+                border: `1px solid ${isSaved ? "#90c79e" : "#dcdcdc"}`,
+              }}
+              className="save-icon"
+            >
+              <BsSave size={24} color={isSaved ? "#ffffff" : "#555"} />
+            </div>
+            <AutorenewIcon onClick={clearShift} />
+          </div>
+        </div>
+
+          <Calendar
+            calendarRows={calendarRows}
+            currentDate={currentDate}
+            monthNames={UKRAINIAN_MONTH_NAMES}
+            prevMonth={prevMonth}
+            nextMonth={nextMonth}
+            totalHours={totalHours}
+            dayHours={dayHours}
+            nightHours={nightHours}
+          />
 
       <div className="instruction-and-legend-container">
         <div
