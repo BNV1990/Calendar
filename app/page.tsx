@@ -322,7 +322,7 @@ const UkrainianCalendar = () => {
         // If not saved, save it
         localStorage.setItem("savedBaseDay", currentBaseDay);
         setSavedShiftBaseDay(currentBaseDay); // Update saved state
-        alert("Робоча зміна збережена!");
+
       }
     } else {
       alert("Немає робочої зміни для збереження.");
