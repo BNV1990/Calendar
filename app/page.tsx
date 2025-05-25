@@ -55,7 +55,7 @@ const UkrainianCalendar = () => {
     null
   ); // New state to hold the saved day from localStorage
   const [showShiftToggleMobile, setShowShiftToggleMobile] = useState(false); // State for shift toggle visibility
-  const [showHoursSummary, setShowHoursSummary] = useState(true); // State for hours summary visibility
+  const [showHoursSummary, setShowHoursSummary] = useState(false); // State for hours summary visibility, default to false
 
   // State for hours summary
   const [totalHours, setTotalHours] = useState(0);
