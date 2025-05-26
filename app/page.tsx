@@ -4,7 +4,7 @@ import React, { useEffect, useState, useCallback } from "react";
 import Legend from "./components/Legend";
 import Calendar from "./components/Calendar";
 import AutorenewIcon from "./components/AutorenewIcon";
-import { BsSave } from "react-icons/bs";
+import { BsSave, BsInfoSquare } from "react-icons/bs";
 import { PiUsersFourThin } from "react-icons/pi"; // Import the new icon
 import { CiClock2 } from "react-icons/ci";
 import dynamic from "next/dynamic";
@@ -56,6 +56,7 @@ const UkrainianCalendar = () => {
   ); // New state to hold the saved day from localStorage
   const [showShiftToggleMobile, setShowShiftToggleMobile] = useState(false); // State for shift toggle visibility
   const [showHoursSummary, setShowHoursSummary] = useState(false); // State for hours summary visibility, default to false
+  const [showLegend, setShowLegend] = useState(false); // New state for legend visibility, default to false
 
   // State for hours summary
   const [totalHours, setTotalHours] = useState(0);
@@ -266,6 +267,12 @@ const UkrainianCalendar = () => {
   }, [showHoursSummary, isClient]);
 
   useEffect(() => {
+    if (isClient) { // Ensure localStorage is available
+      localStorage.setItem('showLegend', String(showLegend));
+    }
+  }, [showLegend, isClient]);
+
+  useEffect(() => {
     if (isClient) {
       setSavedShiftBaseDay(localStorage.getItem("savedBaseDay")); // Set the saved day state
 
@@ -448,7 +455,18 @@ const UkrainianCalendar = () => {
 
         {/* Wrapper for Save/Refresh buttons - Kept second in JSX structure */}
         <div className="header-controls__buttons-wrapper">
-          {/* New Clock Button (always visible) */}
+          {/* BsInfoSquare Button */}
+          <div
+            onClick={() => setShowLegend(!showLegend)}
+            className="icon-button"
+            style={{
+              backgroundColor: showLegend ? "#90c79e" : "#ffffff",
+              border: `1px solid ${showLegend ? "#90c79e" : "#dcdcdc"}`,
+            }}
+          >
+            <BsInfoSquare size={24} color={showLegend ? "#ffffff" : "#555"} />
+          </div>
+          {/* Original Clock Button (now always visible) */}
           <div
             onClick={() => {
               setShowHoursSummary(!showHoursSummary);
@@ -508,7 +526,9 @@ const UkrainianCalendar = () => {
 
       <div className="instruction-and-legend-container">
         <div
-          className="legend-and-summary-container"
+          className={`legend-and-summary-container ${
+            showLegend ? "legend-visible" : "legend-hidden"
+          }`}
           style={{ marginTop: "10px" }}
         >
           <Legend />

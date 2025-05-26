@@ -763,6 +763,19 @@ body.dark-mode .instruction-text {
 /* Hide mobile summary on desktop */
 /* Removed redundant rule */
 
+/* Legend visibility and animation */
+.legend-and-summary-container.legend-visible {
+  opacity: 1;
+  max-height: 500px; /* Adjust as needed to fit the content */
+  transition: opacity 0.3s ease-in-out, max-height 0.3s ease-in-out;
+}
+
+.legend-and-summary-container.legend-hidden {
+  opacity: 0;
+  max-height: 0;
+  transition: opacity 0.3s ease-in-out, max-height 0.3s ease-in-out;
+}
+
 /* ======== MOBILE STYLES (@media (max-width: 768px)) ======== */
 @media (max-width: 768px) {
   .container {
