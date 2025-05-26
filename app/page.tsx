@@ -4,14 +4,19 @@ import React, { useEffect, useState, useCallback } from "react";
 import Legend from "./components/Legend";
 import Calendar from "./components/Calendar";
 import AutorenewIcon from "./components/AutorenewIcon";
-import { BsSave, BsInfoSquare } from "react-icons/bs";
-import { PiUsersFourThin } from "react-icons/pi"; // Import the new icon
-import { CiClock2 } from "react-icons/ci";
+import { BsSave } from "react-icons/bs";
+import { PiUsersFourDuotone } from "react-icons/pi"; // Import the new icon
+import { FiClock } from "react-icons/fi";
 import dynamic from "next/dynamic";
 
 const DynamicShiftToggle = dynamic(() => import("./components/ShiftToggle"), {
   ssr: false,
 });
+
+const DynamicBsInfoSquare = dynamic(
+  () => import("react-icons/bs").then((mod) => mod.BsInfoSquare),
+  { ssr: false }
+);
 
 interface ShiftInfo {
   year: number;
@@ -464,7 +469,7 @@ const UkrainianCalendar = () => {
               border: `1px solid ${showLegend ? "#90c79e" : "#dcdcdc"}`,
             }}
           >
-            <BsInfoSquare size={24} color={showLegend ? "#ffffff" : "#555"} />
+            <DynamicBsInfoSquare size={24} color={showLegend ? "#ffffff" : "#555"} />
           </div>
           {/* Original Clock Button (now always visible) */}
           <div
@@ -477,7 +482,7 @@ const UkrainianCalendar = () => {
               border: `1px solid ${showHoursSummary ? "#90c79e" : "#dcdcdc"}`,
             }}
           >
-            <CiClock2 size={24} color={showHoursSummary ? "#ffffff" : "#555"} />
+            <FiClock size={24} color={showHoursSummary ? "#ffffff" : "#555"} />
           </div>
           {/* PiUsersFourThin Button (now always visible) */}
           <div
@@ -490,7 +495,7 @@ const UkrainianCalendar = () => {
               }`,
             }}
           >
-            <PiUsersFourThin
+            <PiUsersFourDuotone
               size={24}
               color={showShiftToggleMobile ? "#ffffff" : "#555"}
             />
