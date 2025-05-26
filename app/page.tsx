@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import Legend from "./components/Legend";
 import Calendar from "./components/Calendar";
 import AutorenewIcon from "./components/AutorenewIcon";
@@ -19,6 +19,11 @@ const DynamicBsInfoSquare = dynamic(
 
 const DynamicFiClock = dynamic(
   () => import("react-icons/fi").then((mod) => mod.FiClock),
+  { ssr: false }
+);
+
+const DynamicRiRadioButtonLine = dynamic(
+  () => import("react-icons/ri").then((mod) => mod.RiRadioButtonLine),
   { ssr: false }
 );
 
@@ -58,6 +63,7 @@ const UkrainianCalendar = () => {
   const [currentDate, setCurrentDate] = useState<Date | null>(null);
   const [baseShiftInfo, setBaseShiftInfo] = useState<ShiftInfo | null>(null); // Initialize to null to prevent hydration mismatch
   const [selectedShiftIndex, setSelectedShiftIndex] = useState(0); // Initialize to 0, will be updated in useEffect
+  const selectedShiftIndexRef = useRef(selectedShiftIndex);
   const [calendarRows, setCalendarRows] = useState<React.JSX.Element[]>([]);
   const [isSaved, setIsSaved] = useState(false); // New state for save status
   const [isClient, setIsClient] = useState(false); // New state for client-side rendering
@@ -68,6 +74,8 @@ const UkrainianCalendar = () => {
   const [showHoursSummary, setShowHoursSummary] = useState(false); // State for hours summary visibility, default to false
   const [showLegend, setShowLegend] = useState(false); // New state for legend visibility, default to false
   const [isClientMounted, setIsClientMounted] = useState(false); // New state for client-side mounting
+  const [isOnlineShiftDetectionActive, setIsOnlineShiftDetectionActive] =
+    useState(false); // New state for online shift detection
 
   // State for hours summary
   const [totalHours, setTotalHours] = useState(0);
@@ -233,22 +241,147 @@ const UkrainianCalendar = () => {
     };
   }, [currentDate, baseShiftInfo, getShiftForDate, showHoursSummary]); // showHoursSummary added here
 
+  const determineCurrentShiftIndex = useCallback(() => {
+    const now = new Date();
+    const effectiveDate = new Date(now); // Start with current date
+    const currentHour = now.getHours();
+    let targetShiftType: "D" | "N" | null = null;
+
+    if (currentHour >= 8 && currentHour < 20) {
+      targetShiftType = "D"; // Day shift
+    } else if (currentHour >= 20) { // 20:00 to 23:59
+      targetShiftType = "N"; // Night shift (starts today)
+    } else if (currentHour >= 0 && currentHour < 8) { // 00:00 to 07:59
+      targetShiftType = "N"; // Night shift (started yesterday)
+      effectiveDate.setDate(effectiveDate.getDate() - 1); // Adjust to previous day
+    }
+
+    if (targetShiftType) {
+      for (let i = 0; i < FIXED_SHIFT_BASE_DATES.length; i++) {
+        const baseInfo = FIXED_SHIFT_BASE_DATES[i];
+        // Use effectiveDate for shift calculation
+        const calculatedShift = getShiftForDate(effectiveDate, baseInfo);
+        if (calculatedShift === targetShiftType) {
+          return i; // Return the index that matches the current shift type
+        }
+      }
+    }
+    return selectedShiftIndex; // Return current selected index if no match or no targetShiftType
+  }, [getShiftForDate, selectedShiftIndex]);
+
+  const handleShiftChange = useCallback(
+    (newShiftIndex: number) => {
+      setSelectedShiftIndex(newShiftIndex);
+
+
+
+      // Use the fixed base date for the selected shift
+      const selectedFixedBase = FIXED_SHIFT_BASE_DATES[newShiftIndex];
+
+      setBaseShiftInfo({
+        year: selectedFixedBase.year,
+        month: selectedFixedBase.month,
+        day: selectedFixedBase.day,
+      });
+
+      // Ensure we are on the current month if the view is not the current month
+      setCurrentDate((prevDate) => {
+        const today = new Date();
+        if (
+          prevDate &&
+          (prevDate.getMonth() !== today.getMonth() ||
+            prevDate.getFullYear() !== today.getFullYear())
+        ) {
+          return new Date();
+        }
+        return prevDate;
+      });
+    },
+    []
+  );
+
+  const saveShift = useCallback(() => {
+    if (isOnlineShiftDetectionActive) {
+      // If online detection is active, saving is not allowed.
+      // No need to deactivate online detection here, as per user's latest feedback.
+      return;
+    }
+
+    if (baseShiftInfo) {
+      const currentBaseDay = baseShiftInfo.day.toString();
+      if (savedShiftBaseDay === currentBaseDay) {
+        // If currently saved, do nothing (make button "inactive" in terms of action)
+      } else {
+        // If not saved, save it
+        localStorage.setItem("savedBaseDay", currentBaseDay);
+        setSavedShiftBaseDay(currentBaseDay); // Update saved state
+      }
+    } else {
+      // No alert, as per user feedback
+    }
+  }, [baseShiftInfo, savedShiftBaseDay, isOnlineShiftDetectionActive]);
+
+  const clearShift = useCallback(() => {
+    // 1. Return to the current month
+    setCurrentDate(new Date());
+
+    // 2. Set the shift slider to the shift saved in localStorage
+    const savedDay = localStorage.getItem("savedBaseDay");
+    let targetShiftInfo: ShiftInfo;
+    let targetVisualShiftIndex: number;
+
+    if (savedDay) {
+      const savedDayInt = parseInt(savedDay);
+      if (!isNaN(savedDayInt) && savedDayInt >= 1 && savedDayInt <= 4) {
+        // Assuming days 1-4 correspond to shifts 1-4
+        const foundIndex = FIXED_SHIFT_BASE_DATES.findIndex(
+          (shift) => shift.day === savedDayInt
+        );
+        if (foundIndex !== -1) {
+          targetShiftInfo = FIXED_SHIFT_BASE_DATES[foundIndex];
+          targetVisualShiftIndex = foundIndex; // Assuming visual index matches array index
+        } else {
+          // Fallback to Shift 1 if saved day doesn't match a fixed base date
+          targetShiftInfo = FIXED_SHIFT_BASE_DATES[0];
+          targetVisualShiftIndex = 0;
+          localStorage.removeItem("savedBaseDay"); // Clear invalid saved day
+          setSavedShiftBaseDay(null);
+        }
+      } else {
+        // No saved shift, default to Shift 1
+        targetShiftInfo = FIXED_SHIFT_BASE_DATES[0];
+        targetVisualShiftIndex = 0;
+      }
+
+      setBaseShiftInfo(targetShiftInfo);
+      setSelectedShiftIndex(targetVisualShiftIndex);
+    }
+  }, []); // No dependencies needed for clearShift as it uses internal state and localStorage
+
   useEffect(() => {
     setIsClient(true); // Set to true once component mounts on client side
     setIsClientMounted(true); // Set to true once component mounts on client side
     setCurrentDate(new Date()); // Set current date on client side
     setIsLoading(false); // Set loading to false once client is mounted
 
-    // Load showShiftToggleMobile state from localStorage
-    const savedShiftToggleState = localStorage.getItem('showShiftToggleMobile');
+    // Load states from localStorage
+    const savedShiftToggleState = localStorage.getItem("showShiftToggleMobile");
     if (savedShiftToggleState !== null) {
-      setShowShiftToggleMobile(savedShiftToggleState === 'true');
+      setShowShiftToggleMobile(savedShiftToggleState === "true");
     }
 
-    // Load showHoursSummary state from localStorage
-    const savedHoursSummaryState = localStorage.getItem('showHoursSummary');
+    const savedHoursSummaryState = localStorage.getItem("showHoursSummary");
     if (savedHoursSummaryState !== null) {
-      setShowHoursSummary(savedHoursSummaryState === 'true');
+      setShowHoursSummary(savedHoursSummaryState === "true");
+    }
+
+    const savedOnlineShiftDetectionState = localStorage.getItem(
+      "isOnlineShiftDetectionActive"
+    );
+    if (savedOnlineShiftDetectionState !== null) {
+      setIsOnlineShiftDetectionActive(
+        savedOnlineShiftDetectionState === "true"
+      );
     }
 
     if ("serviceWorker" in navigator) {
@@ -268,22 +401,38 @@ const UkrainianCalendar = () => {
 
   // Effects to save states to localStorage whenever they change
   useEffect(() => {
-    if (isClient) { // Ensure localStorage is available
-      localStorage.setItem('showShiftToggleMobile', String(showShiftToggleMobile));
+    if (isClient) {
+      // Ensure localStorage is available
+      localStorage.setItem(
+        "showShiftToggleMobile",
+        String(showShiftToggleMobile)
+      );
     }
   }, [showShiftToggleMobile, isClient]);
 
   useEffect(() => {
-    if (isClient) { // Ensure localStorage is available
-      localStorage.setItem('showHoursSummary', String(showHoursSummary));
+    if (isClient) {
+      // Ensure localStorage is available
+      localStorage.setItem("showHoursSummary", String(showHoursSummary));
     }
   }, [showHoursSummary, isClient]);
 
   useEffect(() => {
-    if (isClient) { // Ensure localStorage is available
-      localStorage.setItem('showLegend', String(showLegend));
+    if (isClient) {
+      // Ensure localStorage is available
+      localStorage.setItem("showLegend", String(showLegend));
     }
   }, [showLegend, isClient]);
+
+  useEffect(() => {
+    if (isClient) {
+      // Ensure localStorage is available
+      localStorage.setItem(
+        "isOnlineShiftDetectionActive",
+        String(isOnlineShiftDetectionActive)
+      );
+    }
+  }, [isOnlineShiftDetectionActive, isClient]);
 
   useEffect(() => {
     if (isClient) {
@@ -345,81 +494,44 @@ const UkrainianCalendar = () => {
     }
   }, [baseShiftInfo, savedShiftBaseDay, currentDate]); // Depend on currentDate as well
 
-  const handleShiftChange = (newShiftIndex: number) => {
-    setSelectedShiftIndex(newShiftIndex); // Keep the visual selection correct
+  // Update the ref whenever selectedShiftIndex changes
+  useEffect(() => {
+    selectedShiftIndexRef.current = selectedShiftIndex;
+  }, [selectedShiftIndex]);
 
-    // Use the fixed base date for the selected shift
-    const selectedFixedBase = FIXED_SHIFT_BASE_DATES[newShiftIndex];
+  // Effect for online shift detection
+  useEffect(() => {
+    let intervalId: NodeJS.Timeout | null = null;
 
-    setBaseShiftInfo({
-      year: selectedFixedBase.year,
-      month: selectedFixedBase.month,
-      day: selectedFixedBase.day, // Corrected typo here
-    });
-
-    // Ensure we are on the current month if the view is not the current month
-    const today = new Date();
-    if (
-      currentDate &&
-      (currentDate.getMonth() !== today.getMonth() ||
-        currentDate.getFullYear() !== today.getFullYear())
-    ) {
-      setCurrentDate(new Date());
-    }
-  };
-
-  const saveShift = () => {
-    if (baseShiftInfo) {
-      const currentBaseDay = baseShiftInfo.day.toString();
-      if (savedShiftBaseDay === currentBaseDay) {
-        // If currently saved, do nothing (make button "inactive" in terms of action)
-        // No alert, no localStorage.removeItem
-      } else {
-        // If not saved, save it
-        localStorage.setItem("savedBaseDay", currentBaseDay);
-        setSavedShiftBaseDay(currentBaseDay); // Update saved state
+    const applyOnlineShift = () => {
+      const detectedIndex = determineCurrentShiftIndex();
+      if (detectedIndex !== selectedShiftIndexRef.current) {
+        handleShiftChange(detectedIndex); // Removed the 'true' argument
       }
+    };
+
+    if (isOnlineShiftDetectionActive) {
+      applyOnlineShift(); // Apply immediately on activation
+      intervalId = setInterval(applyOnlineShift, 5 * 60 * 1000); // Re-check every 5 minutes
     } else {
-      alert("Немає робочої зміни для збереження.");
-    }
-  };
-
-  const clearShift = () => {
-    // 1. Return to the current month
-    setCurrentDate(new Date());
-
-    // 2. Set the shift slider to the shift saved in localStorage
-    const savedDay = localStorage.getItem("savedBaseDay");
-    let targetShiftInfo: ShiftInfo;
-    let targetVisualShiftIndex: number;
-
-    if (savedDay) {
-      const savedDayInt = parseInt(savedDay);
-      if (!isNaN(savedDayInt) && savedDayInt >= 1 && savedDayInt <= 4) {
-        // Assuming days 1-4 correspond to shifts 1-4
-        const foundIndex = FIXED_SHIFT_BASE_DATES.findIndex(
-          (shift) => shift.day === savedDayInt
-        );
-        if (foundIndex !== -1) {
-          targetShiftInfo = FIXED_SHIFT_BASE_DATES[foundIndex];
-          targetVisualShiftIndex = foundIndex; // Assuming visual index matches array index
-        } else {
-          // Fallback to Shift 1 if saved day doesn't match a fixed base date
-          targetShiftInfo = FIXED_SHIFT_BASE_DATES[0];
-          targetVisualShiftIndex = 0;
-          localStorage.removeItem("savedBaseDay"); // Clear invalid saved day
-          setSavedShiftBaseDay(null);
-        }
-      } else {
-        // No saved shift, default to Shift 1
-        targetShiftInfo = FIXED_SHIFT_BASE_DATES[0];
-        targetVisualShiftIndex = 0;
+      // When online detection is deactivated, clear the interval
+      if (intervalId) {
+        clearInterval(intervalId);
       }
-
-      setBaseShiftInfo(targetShiftInfo);
-      setSelectedShiftIndex(targetVisualShiftIndex);
+      // clearShift() is now called explicitly by the online detection button's onClick
     }
-  };
+
+    return () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
+    };
+  }, [
+    isOnlineShiftDetectionActive,
+    determineCurrentShiftIndex,
+    handleShiftChange,
+    clearShift,
+  ]);
 
   const prevMonth = () => {
     setCurrentDate((prevDate) => {
@@ -491,7 +603,10 @@ const UkrainianCalendar = () => {
               {[...Array(6)].map((_, i) => (
                 <tr key={i}>
                   {[...Array(7)].map((_, j) => (
-                    <td key={`${i}-${j}`} className="skeleton-calendar-cell"></td>
+                    <td
+                      key={`${i}-${j}`}
+                      className="skeleton-calendar-cell"
+                    ></td>
                   ))}
                 </tr>
               ))}
@@ -535,7 +650,10 @@ const UkrainianCalendar = () => {
                     border: `1px solid ${showLegend ? "#90c79e" : "#dcdcdc"}`,
                   }}
                 >
-                  <DynamicBsInfoSquare size={24} color={showLegend ? "#ffffff" : "#555"} />
+                  <DynamicBsInfoSquare
+                    size={24}
+                    color={showLegend ? "#ffffff" : "#555"}
+                  />
                 </div>
               )}
               {/* Original Clock Button (now always visible) */}
@@ -546,38 +664,87 @@ const UkrainianCalendar = () => {
                 className="icon-button"
                 style={{
                   backgroundColor: showHoursSummary ? "#90c79e" : "#ffffff",
-                  border: `1px solid ${showHoursSummary ? "#90c79e" : "#dcdcdc"}`,
+                  border: `1px solid ${
+                    showHoursSummary ? "#90c79e" : "#dcdcdc"
+                  }`,
                 }}
               >
-                <DynamicFiClock size={24} color={showHoursSummary ? "#ffffff" : "#555"} />
+                <DynamicFiClock
+                  size={24}
+                  color={showHoursSummary ? "#ffffff" : "#555"}
+                />
               </div>
               {/* PiUsersFourThin Button (now always visible) */}
               <div
                 onClick={() => setShowShiftToggleMobile(!showShiftToggleMobile)}
                 className="icon-button"
                 style={{
-                  backgroundColor: showShiftToggleMobile ? "#90c79e" : "#ffffff",
+                  backgroundColor: showShiftToggleMobile
+                    ? "#90c79e"
+                    : "#ffffff",
                   border: `1px solid ${
                     showShiftToggleMobile ? "#90c79e" : "#dcdcdc"
                   }`,
                 }}
               >
-            <PiUsersFour
-              size={24}
-              color={showShiftToggleMobile ? "#ffffff" : "#555"}
-            />
+                <PiUsersFour
+                  size={24}
+                  color={showShiftToggleMobile ? "#ffffff" : "#555"}
+                />
               </div>
+
+              {/* New Online Shift Detection Button */}
+              {isClientMounted && (
+                <div
+                  onClick={() => {
+                    if (isOnlineShiftDetectionActive) { // If currently active, and user is turning it OFF
+                      clearShift(); // Revert to saved shift or default
+                    }
+                    setIsOnlineShiftDetectionActive(
+                      !isOnlineShiftDetectionActive
+                    );
+                  }}
+                  className="icon-button"
+                  style={{
+                    backgroundColor: isOnlineShiftDetectionActive
+                      ? "#90c79e"
+                      : "#ffffff",
+                    border: `1px solid ${
+                      isOnlineShiftDetectionActive ? "#90c79e" : "#dcdcdc"
+                    }`,
+                  }}
+                >
+                  <DynamicRiRadioButtonLine
+                    size={24}
+                    color={isOnlineShiftDetectionActive ? "#ffffff" : "#555"}
+                  />
+                </div>
+              )}
 
               {/* Existing Save Button (always visible) */}
               <div
                 onClick={saveShift}
                 className="icon-button"
                 style={{
-                  backgroundColor: isSaved ? "#90c79e" : "#ffffff",
-                  border: `1px solid ${isSaved ? "#90c79e" : "#dcdcdc"}`,
+                  backgroundColor:
+                    isSaved && !isOnlineShiftDetectionActive
+                      ? "#90c79e"
+                      : "#ffffff",
+                  border: `1px solid ${
+                    isSaved && !isOnlineShiftDetectionActive
+                      ? "#90c79e"
+                      : "#dcdcdc"
+                  }`,
                 }}
               >
-                <BsSave size={24} color={isSaved ? "#ffffff" : "#555"} />
+                <BsSave
+                  size={24}
+                  color={
+                    isSaved && !isOnlineShiftDetectionActive
+                      ? "#ffffff"
+                      : "#555"
+                  }
+                />
               </div>
 
               <AutorenewIcon onClick={clearShift} />
