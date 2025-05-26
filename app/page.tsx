@@ -5,8 +5,7 @@ import Legend from "./components/Legend";
 import Calendar from "./components/Calendar";
 import AutorenewIcon from "./components/AutorenewIcon";
 import { BsSave } from "react-icons/bs";
-import { PiUsersFourDuotone } from "react-icons/pi"; // Import the new icon
-import { FiClock } from "react-icons/fi";
+import { PiUsersFour } from "react-icons/pi"; // Import the new icon
 import dynamic from "next/dynamic";
 
 const DynamicShiftToggle = dynamic(() => import("./components/ShiftToggle"), {
@@ -15,6 +14,11 @@ const DynamicShiftToggle = dynamic(() => import("./components/ShiftToggle"), {
 
 const DynamicBsInfoSquare = dynamic(
   () => import("react-icons/bs").then((mod) => mod.BsInfoSquare),
+  { ssr: false }
+);
+
+const DynamicFiClock = dynamic(
+  () => import("react-icons/fi").then((mod) => mod.FiClock),
   { ssr: false }
 );
 
@@ -50,6 +54,7 @@ const FIXED_SHIFT_BASE_DATES: ShiftInfo[] = [
 ];
 
 const UkrainianCalendar = () => {
+  const [isLoading, setIsLoading] = useState(true); // New state for loading skeleton
   const [currentDate, setCurrentDate] = useState<Date | null>(null);
   const [baseShiftInfo, setBaseShiftInfo] = useState<ShiftInfo | null>(null); // Initialize to null to prevent hydration mismatch
   const [selectedShiftIndex, setSelectedShiftIndex] = useState(0); // Initialize to 0, will be updated in useEffect
@@ -62,6 +67,7 @@ const UkrainianCalendar = () => {
   const [showShiftToggleMobile, setShowShiftToggleMobile] = useState(false); // State for shift toggle visibility
   const [showHoursSummary, setShowHoursSummary] = useState(false); // State for hours summary visibility, default to false
   const [showLegend, setShowLegend] = useState(false); // New state for legend visibility, default to false
+  const [isClientMounted, setIsClientMounted] = useState(false); // New state for client-side mounting
 
   // State for hours summary
   const [totalHours, setTotalHours] = useState(0);
@@ -229,7 +235,9 @@ const UkrainianCalendar = () => {
 
   useEffect(() => {
     setIsClient(true); // Set to true once component mounts on client side
+    setIsClientMounted(true); // Set to true once component mounts on client side
     setCurrentDate(new Date()); // Set current date on client side
+    setIsLoading(false); // Set loading to false once client is mounted
 
     // Load showShiftToggleMobile state from localStorage
     const savedShiftToggleState = localStorage.getItem('showShiftToggleMobile');
@@ -443,105 +451,166 @@ const UkrainianCalendar = () => {
 
   return (
     <div className="container">
-      <div className="header-controls">
-        {/* Wrapper for ShiftToggle */}
-        <div
-          className={`header-controls__toggle-wrapper ${
-            showShiftToggleMobile
-              ? "shift-toggle-wrapper"
-              : "shift-toggle-wrapper--hidden"
-          }`}
-        >
-          <DynamicShiftToggle
-            selectedShiftIndex={selectedShiftIndex}
-            onShiftChange={handleShiftChange}
-          />
-        </div>
+      {isLoading ? (
+        <>
+          {/* Skeleton for header controls */}
+          <div className="header-controls skeleton-header-controls">
+            <div className="skeleton-toggle-wrapper">
+              <div className="skeleton-toggle-slider"></div>
+              <div className="skeleton-toggle-button"></div>
+              <div className="skeleton-toggle-button"></div>
+              <div className="skeleton-toggle-button"></div>
+              <div className="skeleton-toggle-button"></div>
+            </div>
+            <div className="header-controls__buttons-wrapper">
+              <div className="skeleton-icon-button"></div>
+              <div className="skeleton-icon-button"></div>
+              <div className="skeleton-icon-button"></div>
+              <div className="skeleton-icon-button"></div>
+              <div className="skeleton-icon-button"></div>
+            </div>
+          </div>
 
-        {/* Wrapper for Save/Refresh buttons - Kept second in JSX structure */}
-        <div className="header-controls__buttons-wrapper">
-          {/* BsInfoSquare Button */}
-          <div
-            onClick={() => setShowLegend(!showLegend)}
-            className="icon-button"
-            style={{
-              backgroundColor: showLegend ? "#90c79e" : "#ffffff",
-              border: `1px solid ${showLegend ? "#90c79e" : "#dcdcdc"}`,
-            }}
-          >
-            <DynamicBsInfoSquare size={24} color={showLegend ? "#ffffff" : "#555"} />
+          {/* Skeleton for calendar header */}
+          <div className="calendar-header skeleton-calendar-header">
+            <div className="skeleton-nav-button"></div>
+            <div className="skeleton-month-display"></div>
+            <div className="skeleton-nav-button"></div>
           </div>
-          {/* Original Clock Button (now always visible) */}
-          <div
-            onClick={() => {
-              setShowHoursSummary(!showHoursSummary);
-            }}
-            className="icon-button"
-            style={{
-              backgroundColor: showHoursSummary ? "#90c79e" : "#ffffff",
-              border: `1px solid ${showHoursSummary ? "#90c79e" : "#dcdcdc"}`,
-            }}
-          >
-            <FiClock size={24} color={showHoursSummary ? "#ffffff" : "#555"} />
+
+          {/* Skeleton for calendar table */}
+          <table className="skeleton-calendar-table">
+            <thead>
+              <tr>
+                {[...Array(7)].map((_, i) => (
+                  <th key={i} className="skeleton-calendar-th"></th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {[...Array(6)].map((_, i) => (
+                <tr key={i}>
+                  {[...Array(7)].map((_, j) => (
+                    <td key={`${i}-${j}`} className="skeleton-calendar-cell"></td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+
+          {/* Skeleton for instruction and legend container */}
+          <div className="instruction-and-legend-container">
+            <div className="legend-and-summary-container">
+              <div className="skeleton-legend-line"></div>
+              <div className="skeleton-legend-line short"></div>
+            </div>
           </div>
-          {/* PiUsersFourThin Button (now always visible) */}
-          <div
-            onClick={() => setShowShiftToggleMobile(!showShiftToggleMobile)}
-            className="icon-button"
-            style={{
-              backgroundColor: showShiftToggleMobile ? "#90c79e" : "#ffffff",
-              border: `1px solid ${
-                showShiftToggleMobile ? "#90c79e" : "#dcdcdc"
-              }`,
-            }}
-          >
-            <PiUsersFourDuotone
+        </>
+      ) : (
+        <>
+          <div className="header-controls">
+            {/* Wrapper for ShiftToggle */}
+            <div
+              className={`header-controls__toggle-wrapper ${
+                showShiftToggleMobile
+                  ? "shift-toggle-wrapper"
+                  : "shift-toggle-wrapper--hidden"
+              }`}
+            >
+              <DynamicShiftToggle
+                selectedShiftIndex={selectedShiftIndex}
+                onShiftChange={handleShiftChange}
+              />
+            </div>
+
+            {/* Wrapper for Save/Refresh buttons - Kept second in JSX structure */}
+            <div className="header-controls__buttons-wrapper">
+              {/* BsInfoSquare Button */}
+              {isClientMounted && (
+                <div
+                  onClick={() => setShowLegend(!showLegend)}
+                  className="icon-button"
+                  style={{
+                    backgroundColor: showLegend ? "#90c79e" : "#ffffff",
+                    border: `1px solid ${showLegend ? "#90c79e" : "#dcdcdc"}`,
+                  }}
+                >
+                  <DynamicBsInfoSquare size={24} color={showLegend ? "#ffffff" : "#555"} />
+                </div>
+              )}
+              {/* Original Clock Button (now always visible) */}
+              <div
+                onClick={() => {
+                  setShowHoursSummary(!showHoursSummary);
+                }}
+                className="icon-button"
+                style={{
+                  backgroundColor: showHoursSummary ? "#90c79e" : "#ffffff",
+                  border: `1px solid ${showHoursSummary ? "#90c79e" : "#dcdcdc"}`,
+                }}
+              >
+                <DynamicFiClock size={24} color={showHoursSummary ? "#ffffff" : "#555"} />
+              </div>
+              {/* PiUsersFourThin Button (now always visible) */}
+              <div
+                onClick={() => setShowShiftToggleMobile(!showShiftToggleMobile)}
+                className="icon-button"
+                style={{
+                  backgroundColor: showShiftToggleMobile ? "#90c79e" : "#ffffff",
+                  border: `1px solid ${
+                    showShiftToggleMobile ? "#90c79e" : "#dcdcdc"
+                  }`,
+                }}
+              >
+            <PiUsersFour
               size={24}
               color={showShiftToggleMobile ? "#ffffff" : "#555"}
             />
+              </div>
+
+              {/* Existing Save Button (always visible) */}
+              <div
+                onClick={saveShift}
+                className="icon-button"
+                style={{
+                  backgroundColor: isSaved ? "#90c79e" : "#ffffff",
+                  border: `1px solid ${isSaved ? "#90c79e" : "#dcdcdc"}`,
+                }}
+              >
+                <BsSave size={24} color={isSaved ? "#ffffff" : "#555"} />
+              </div>
+
+              <AutorenewIcon onClick={clearShift} />
+            </div>
           </div>
 
-          {/* Existing Save Button (always visible) */}
-          <div
-            onClick={saveShift}
-            className="icon-button"
-            style={{
-              backgroundColor: isSaved ? "#90c79e" : "#ffffff",
-              border: `1px solid ${isSaved ? "#90c79e" : "#dcdcdc"}`,
-            }}
-          >
-            <BsSave size={24} color={isSaved ? "#ffffff" : "#555"} />
+          <Calendar
+            calendarRows={calendarRows}
+            currentDate={currentDate}
+            monthNames={UKRAINIAN_MONTH_NAMES}
+            prevMonth={prevMonth}
+            nextMonth={nextMonth}
+            totalHours={totalHours}
+            dayHours={dayHours}
+            nightHours={nightHours}
+            showHoursSummary={showHoursSummary}
+          />
+
+          <div className="instruction-and-legend-container">
+            <div
+              className={`legend-and-summary-container ${
+                showLegend ? "legend-visible" : "legend-hidden"
+              }`}
+              style={{ marginTop: "10px" }}
+            >
+              <Legend />
+            </div>
           </div>
 
-          <AutorenewIcon onClick={clearShift} />
-        </div>
-      </div>
-
-      <Calendar
-        calendarRows={calendarRows}
-        currentDate={currentDate}
-        monthNames={UKRAINIAN_MONTH_NAMES}
-        prevMonth={prevMonth}
-        nextMonth={nextMonth}
-        totalHours={totalHours}
-        dayHours={dayHours}
-        nightHours={nightHours}
-        showHoursSummary={showHoursSummary}
-      />
-
-      <div className="instruction-and-legend-container">
-        <div
-          className={`legend-and-summary-container ${
-            showLegend ? "legend-visible" : "legend-hidden"
-          }`}
-          style={{ marginTop: "10px" }}
-        >
-          <Legend />
-        </div>
-      </div>
-
-      {/* New container for Save and Reset buttons */}
-      <div className="save-reset-buttons-container"></div>
+          {/* New container for Save and Reset buttons */}
+          <div className="save-reset-buttons-container"></div>
+        </>
+      )}
     </div>
   );
 };
