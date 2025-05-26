@@ -10,6 +10,7 @@ body {
   padding: 20px;
   box-sizing: border-box; /* Include padding in element's total width and height */
   overflow-y: scroll; /* Always show vertical scrollbar to prevent horizontal shifting */
+  overscroll-behavior-y: contain; /* Prevent pull-to-refresh and overscroll effects */
 }
 
 .container {
