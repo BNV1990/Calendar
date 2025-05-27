@@ -1,9 +1,10 @@
 import React from "react";
 import styles from "./ShiftToggle.module.css";
 
-interface ShiftToggleProps {
+export interface ShiftToggleProps { // Export the interface
   selectedShiftIndex: number;
   onShiftChange: (index: number) => void;
+  disabled: boolean; // Add disabled prop
 }
 
 const SHIFT_LABELS = ["Зміна 1", "Зміна 2", "Зміна 3", "Зміна 4"];
@@ -11,9 +12,10 @@ const SHIFT_LABELS = ["Зміна 1", "Зміна 2", "Зміна 3", "Змін�
 const ShiftToggle: React.FC<ShiftToggleProps> = ({
   selectedShiftIndex,
   onShiftChange,
+  disabled, // Destructure disabled prop
 }) => {
   return (
-    <div className={styles.toggleContainer}>
+    <div className={`${styles.toggleContainer} ${disabled ? styles.disabled : ""}`}>
       {SHIFT_LABELS.map((label, index) => (
         <button
           key={index}
@@ -21,6 +23,7 @@ const ShiftToggle: React.FC<ShiftToggleProps> = ({
             selectedShiftIndex === index ? styles.active : ""
           }`}
           onClick={() => onShiftChange(index)}
+          disabled={disabled} // Apply disabled attribute
         >
           {label}
         </button>

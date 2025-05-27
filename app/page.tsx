@@ -8,9 +8,14 @@ import { BsSave } from "react-icons/bs";
 import { PiUsersFour } from "react-icons/pi"; // Import the new icon
 import dynamic from "next/dynamic";
 
-const DynamicShiftToggle = dynamic(() => import("./components/ShiftToggle"), {
-  ssr: false,
-});
+import type { ShiftToggleProps } from "./components/ShiftToggle"; // Import the props type
+
+const DynamicShiftToggle = dynamic<ShiftToggleProps>(
+  () => import("./components/ShiftToggle"),
+  {
+    ssr: false,
+  }
+);
 
 const DynamicBsInfoSquare = dynamic(
   () => import("react-icons/bs").then((mod) => mod.BsInfoSquare),
@@ -82,6 +87,11 @@ const UkrainianCalendar = () => {
   const [dayHours, setDayHours] = useState(0);
   const [nightHours, setNightHours] = useState(0);
 
+  const timeoutIdRef = useRef<NodeJS.Timeout | null>(null); // Для ID setTimeout
+  const isOnlineRef = useRef(isOnlineShiftDetectionActive); // Реф для isOnlineShiftDetectionActive
+  const currentShiftIndexRefFromState = useRef(selectedShiftIndex); // Реф для selectedShiftIndex (як ви вже мали)
+  const scheduleNextCheckRef = useRef<(() => void) | null>(null); // Ref for scheduleNextCheck
+
   const getShiftForDate = useCallback(
     (targetDate: Date, bsInfo: ShiftInfo | null): string | null => {
       if (!bsInfo) return null;
@@ -101,7 +111,9 @@ const UkrainianCalendar = () => {
       const cycleIndex =
         ((diffInDays % SHIFT_CYCLE_VALUES.length) + SHIFT_CYCLE_VALUES.length) %
         SHIFT_CYCLE_VALUES.length;
-      return SHIFT_CYCLE_VALUES[cycleIndex];
+      const calculatedShift = SHIFT_CYCLE_VALUES[cycleIndex];
+      console.log(`[getShiftForDate] Target: ${targetDate.toLocaleDateString()}, Base: ${baseDateMidnight.toLocaleDateString()}, DiffDays: ${diffInDays}, CycleIndex: ${cycleIndex}, CalculatedShift: ${calculatedShift}`);
+      return calculatedShift;
     },
     []
   );
@@ -243,15 +255,23 @@ const UkrainianCalendar = () => {
 
   const determineCurrentShiftIndex = useCallback(() => {
     const now = new Date();
-    const effectiveDate = new Date(now); // Start with current date
+    const effectiveDate = new Date(now);
     const currentHour = now.getHours();
     let targetShiftType: "D" | "N" | null = null;
 
+    // ... (ваша логіка визначення targetShiftType та effectiveDate) ...
+    // Додайте логування тут, як ми робили раніше
+    console.log(
+      `[determineCurrentShiftIndex] Now: ${now.toISOString()}, Hour: ${currentHour}, TargetType: ${targetShiftType}, EffectiveDate: ${effectiveDate.toISOString()}`
+    );
+
     if (currentHour >= 8 && currentHour < 20) {
       targetShiftType = "D"; // Day shift
-    } else if (currentHour >= 20) { // 20:00 to 23:59
+    } else if (currentHour >= 20) {
+      // 20:00 to 23:59
       targetShiftType = "N"; // Night shift (starts today)
-    } else if (currentHour >= 0 && currentHour < 8) { // 00:00 to 07:59
+    } else if (currentHour >= 0 && currentHour < 8) {
+      // 00:00 to 07:59
       targetShiftType = "N"; // Night shift (started yesterday)
       effectiveDate.setDate(effectiveDate.getDate() - 1); // Adjust to previous day
     }
@@ -259,46 +279,54 @@ const UkrainianCalendar = () => {
     if (targetShiftType) {
       for (let i = 0; i < FIXED_SHIFT_BASE_DATES.length; i++) {
         const baseInfo = FIXED_SHIFT_BASE_DATES[i];
-        // Use effectiveDate for shift calculation
         const calculatedShift = getShiftForDate(effectiveDate, baseInfo);
+        console.log(
+          `[determineCurrentShiftIndex] Checking Shift ${i + 1}, BaseDay ${
+            baseInfo.day
+          }, Calculated ${calculatedShift}`
+        );
         if (calculatedShift === targetShiftType) {
-          return i; // Return the index that matches the current shift type
+          console.log(`[determineCurrentShiftIndex] Match! Index: ${i}`);
+          return i;
         }
       }
     }
-    return selectedShiftIndex; // Return current selected index if no match or no targetShiftType
-  }, [getShiftForDate, selectedShiftIndex]);
+    console.warn(
+      "[determineCurrentShiftIndex] No match. Returning ref value:",
+      selectedShiftIndexRef.current
+    );
+    return currentShiftIndexRefFromState.current; // ВИКОРИСТОВУЙТЕ РЕФ, А НЕ СТАН З ЗАМИКАННЯ
+  }, [getShiftForDate]); // Видаліть selectedShiftIndex з залежностей, він тепер не потрібен тут
 
-  const handleShiftChange = useCallback(
-    (newShiftIndex: number) => {
-      setSelectedShiftIndex(newShiftIndex);
+  const handleShiftChange = useCallback((newShiftIndex: number, isInternalCall: boolean = false) => {
+    if (isOnlineShiftDetectionActive && !isInternalCall) {
+      console.log("Shift change disabled: Online shift detection is active for manual changes.");
+      return;
+    }
+    setSelectedShiftIndex(newShiftIndex);
 
+    // Use the fixed base date for the selected shift
+    const selectedFixedBase = FIXED_SHIFT_BASE_DATES[newShiftIndex];
 
+    setBaseShiftInfo({
+      year: selectedFixedBase.year,
+      month: selectedFixedBase.month,
+      day: selectedFixedBase.day,
+    });
 
-      // Use the fixed base date for the selected shift
-      const selectedFixedBase = FIXED_SHIFT_BASE_DATES[newShiftIndex];
-
-      setBaseShiftInfo({
-        year: selectedFixedBase.year,
-        month: selectedFixedBase.month,
-        day: selectedFixedBase.day,
-      });
-
-      // Ensure we are on the current month if the view is not the current month
-      setCurrentDate((prevDate) => {
-        const today = new Date();
-        if (
-          prevDate &&
-          (prevDate.getMonth() !== today.getMonth() ||
-            prevDate.getFullYear() !== today.getFullYear())
-        ) {
-          return new Date();
-        }
-        return prevDate;
-      });
-    },
-    []
-  );
+    // Ensure we are on the current month if the view is not the current month
+    setCurrentDate((prevDate) => {
+      const today = new Date();
+      if (
+        prevDate &&
+        (prevDate.getMonth() !== today.getMonth() ||
+          prevDate.getFullYear() !== today.getFullYear())
+      ) {
+        return new Date();
+      }
+      return prevDate;
+    });
+  }, [isOnlineShiftDetectionActive]); // Add isOnlineShiftDetectionActive to dependencies
 
   const saveShift = useCallback(() => {
     if (isOnlineShiftDetectionActive) {
@@ -452,7 +480,7 @@ const UkrainianCalendar = () => {
           targetShiftInfo = FIXED_SHIFT_BASE_DATES[foundIndex];
           targetVisualShiftIndex = foundIndex;
         } else {
-          // If saved day is invalid or doesn't match a fixed base date, default to Shift 1
+          // Fallback to Shift 1 if saved day doesn't match a fixed base date
           targetShiftInfo = FIXED_SHIFT_BASE_DATES[0];
           targetVisualShiftIndex = 0;
           localStorage.removeItem("savedBaseDay"); // Clear invalid saved day
@@ -494,43 +522,160 @@ const UkrainianCalendar = () => {
     }
   }, [baseShiftInfo, savedShiftBaseDay, currentDate]); // Depend on currentDate as well
 
-  // Update the ref whenever selectedShiftIndex changes
+  // Оновлюємо рефи при зміні відповідних станів
   useEffect(() => {
-    selectedShiftIndexRef.current = selectedShiftIndex;
+    isOnlineRef.current = isOnlineShiftDetectionActive;
+  }, [isOnlineShiftDetectionActive]);
+
+  useEffect(() => {
+    currentShiftIndexRefFromState.current = selectedShiftIndex;
   }, [selectedShiftIndex]);
 
-  // Effect for online shift detection
-  useEffect(() => {
-    let intervalId: NodeJS.Timeout | null = null;
+  // --- Функції, які НЕ залежать від стану напряму, а використовують рефи або передані аргументи ---
 
-    const applyOnlineShift = () => {
-      const detectedIndex = determineCurrentShiftIndex();
-      if (detectedIndex !== selectedShiftIndexRef.current) {
-        handleShiftChange(detectedIndex); // Removed the 'true' argument
-      }
-    };
+  // Define performUpdateAndReschedule as a useCallback
+  const performUpdateAndReschedule = useCallback(() => {
+    const currentPerformTime = new Date();
+    console.log(
+      `[performUpdateAndReschedule] Timeout fired or initial call. Current time: ${currentPerformTime.toISOString()}`
+    );
+    if (!isOnlineRef.current) {
+      console.log(
+        "[performUpdateAndReschedule] Became offline before action. Aborting."
+      );
+      return;
+    }
 
-    if (isOnlineShiftDetectionActive) {
-      applyOnlineShift(); // Apply immediately on activation
-      intervalId = setInterval(applyOnlineShift, 5 * 60 * 1000); // Re-check every 5 minutes
+    const detectedIndex = determineCurrentShiftIndex();
+    console.log(
+      `[performUpdateAndReschedule] Detected: ${detectedIndex}, Current in Ref: ${currentShiftIndexRefFromState.current}`
+    );
+
+    if (detectedIndex !== currentShiftIndexRefFromState.current) {
+      console.log(
+        `[performUpdateAndReschedule] Change needed. Calling handleShiftChange(${detectedIndex}, true)`
+      );
+      handleShiftChange(detectedIndex, true); // Pass true for internal call
     } else {
-      // When online detection is deactivated, clear the interval
-      if (intervalId) {
-        clearInterval(intervalId);
+      console.log("[performUpdateAndReschedule] No change needed.");
+    }
+    // Recursive call to scheduleNextCheck
+    // Use the ref to call scheduleNextCheck to break circular dependency
+    if (scheduleNextCheckRef.current) {
+      scheduleNextCheckRef.current();
+    }
+  }, [isOnlineRef, determineCurrentShiftIndex, currentShiftIndexRefFromState, handleShiftChange]);
+
+
+  const scheduleNextCheck = useCallback(() => {
+    if (timeoutIdRef.current) {
+      clearTimeout(timeoutIdRef.current);
+    }
+
+    if (!isOnlineRef.current) {
+      console.log(
+        "[scheduleNextCheck] Online detection is OFF. Not scheduling."
+      );
+      return;
+    }
+
+    const now = new Date();
+    const nextChangeTime = new Date(now);
+    nextChangeTime.setMinutes(0, 0, 0);
+    const currentHour = now.getHours();
+
+    if (currentHour < 8) nextChangeTime.setHours(8);
+    else if (currentHour < 20) nextChangeTime.setHours(20);
+    else {
+      nextChangeTime.setHours(8);
+      nextChangeTime.setDate(now.getDate() + 1);
+    }
+
+    const msUntilNextChange = nextChangeTime.getTime() - now.getTime();
+    console.log(`[scheduleNextCheck] Scheduling next check. Now: ${now.toISOString()}, Next change at: ${nextChangeTime.toISOString()}, MS until: ${msUntilNextChange}`);
+
+    if (msUntilNextChange <= 0) {
+      console.log(
+        `[scheduleNextCheck] Time is past (${msUntilNextChange}ms). Scheduling immediate check.`
+      );
+      timeoutIdRef.current = setTimeout(performUpdateAndReschedule, 50);
+      return;
+    }
+
+    console.log(
+      `[scheduleNextCheck] Next check in ${Math.round(
+        msUntilNextChange / 1000
+      )}s`
+    );
+    timeoutIdRef.current = setTimeout(
+      performUpdateAndReschedule,
+      msUntilNextChange
+    );
+  }, [timeoutIdRef, isOnlineRef, performUpdateAndReschedule]);
+
+  // Effect to keep scheduleNextCheckRef updated
+  useEffect(() => {
+    scheduleNextCheckRef.current = scheduleNextCheck;
+  }, [scheduleNextCheck]);
+
+  // Основний useEffect для запуску/зупинки
+  useEffect(() => {
+    if (isOnlineShiftDetectionActive) {
+      console.log("[Effect isOnline] Activating online detection.");
+      // При першій активації, нам потрібно негайно перевірити та запланувати.
+      // Функція scheduleNextCheck сама зробить перевірку, якщо msUntilNextChange <= 0.
+
+      // Потрібно викликати логіку, яка перевіряє та оновлює зміну, а потім планує.
+      // Це може бути сама performUpdateAndReschedule з тіла scheduleNextCheck.
+      const initialUpdateAndSchedule = () => {
+        const currentInitialTime = new Date();
+        console.log(
+          `[Effect isOnline] Initial call to initialUpdateAndSchedule. Current time: ${currentInitialTime.toISOString()}, isOnlineRef.current: ${isOnlineRef.current}`
+        );
+        if (!isOnlineRef.current) {
+          console.log(
+            "[Effect isOnline] Became offline before initial action. Aborting."
+          );
+          return;
+        }
+        const detectedIndex = determineCurrentShiftIndex();
+        console.log(
+          `[Effect isOnline] Initial Detected: ${detectedIndex}, Current in Ref: ${currentShiftIndexRefFromState.current}`
+        );
+        if (detectedIndex !== currentShiftIndexRefFromState.current) {
+          console.log(
+            `[Effect isOnline] Initial Change needed. Calling handleShiftChange(${detectedIndex}, true)`
+          );
+          handleShiftChange(detectedIndex, true); // Pass true for internal call
+        } else {
+          console.log("[Effect isOnline] Initial No change needed.");
+        }
+        scheduleNextCheck(); // Запускаємо цикл планування
+      };
+      initialUpdateAndSchedule();
+
+    } else {
+      console.log(
+        "[Effect isOnline] Deactivating online detection. Clearing timeout."
+      );
+      if (timeoutIdRef.current) {
+        clearTimeout(timeoutIdRef.current);
+        timeoutIdRef.current = null;
       }
-      // clearShift() is now called explicitly by the online detection button's onClick
     }
 
     return () => {
-      if (intervalId) {
-        clearInterval(intervalId);
+      console.log("[Effect isOnline] Cleanup. Clearing timeout.");
+      if (timeoutIdRef.current) {
+        clearTimeout(timeoutIdRef.current);
+        timeoutIdRef.current = null;
       }
     };
   }, [
     isOnlineShiftDetectionActive,
     determineCurrentShiftIndex,
     handleShiftChange,
-    clearShift,
+    scheduleNextCheck, // Added scheduleNextCheck back to dependencies
   ]);
 
   const prevMonth = () => {
@@ -635,6 +780,7 @@ const UkrainianCalendar = () => {
               <DynamicShiftToggle
                 selectedShiftIndex={selectedShiftIndex}
                 onShiftChange={handleShiftChange}
+                disabled={isOnlineShiftDetectionActive} // Pass disabled prop
               />
             </div>
 
@@ -697,7 +843,8 @@ const UkrainianCalendar = () => {
               {isClientMounted && (
                 <div
                   onClick={() => {
-                    if (isOnlineShiftDetectionActive) { // If currently active, and user is turning it OFF
+                    if (isOnlineShiftDetectionActive) {
+                      // If currently active, and user is turning it OFF
                       clearShift(); // Revert to saved shift or default
                     }
                     setIsOnlineShiftDetectionActive(
