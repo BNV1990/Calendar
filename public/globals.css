@@ -4,12 +4,12 @@ body {
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  min-height: 100vh;
+  /* Removed min-height: 100vh to allow body to shrink to content */
   margin: 0;
   background-color: #eef2f7; /* Softer background */
   padding: 20px;
   box-sizing: border-box; /* Include padding in element's total width and height */
-  overflow-y: scroll; /* Always show vertical scrollbar to prevent horizontal shifting */
+  overflow-y: auto; /* Only show vertical scrollbar when content overflows */
   overscroll-behavior-y: contain; /* Prevent pull-to-refresh and overscroll effects */
 }
 
@@ -21,8 +21,9 @@ body {
   text-align: center;
   width: 100%; /* Use full width on smaller screens */
   max-width: 750px; /* Slightly increased max-width */
-  margin-top: 5px; /* Reduced margin top to 5px */
+  margin-top: 0; /* Removed margin top to reduce space */
   position: relative; /* Added for absolute positioning of children */
+  height: fit-content; /* Ensure height is limited by content */
 }
 
 /* Dark Mode Styles */
@@ -1111,12 +1112,25 @@ body.dark-mode .instruction-text {
   }
 
   /* You might need to adjust specific container heights if they are fixed */
-  .container {
-    min-height: 100vh; /* Ensure the main container also takes full height */
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start; /* Align content to the top */
+  /* Apply container specific min-height AND related flex properties ONLY on touch devices 
+     that also match the outer query conditions. */
+  @media (hover: none) and (pointer: coarse) {
+    .container {
+      min-height: 100vh; /* Ensure the main container also takes full height on touch devices */
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start; /* Align content to the top */
+    }
   }
+  /*
+    On desktop browsers (which typically have hover: hover and pointer: fine),
+    the inner @media query will not match. Therefore, the .container will not receive
+    min-height: 100vh or the associated flex properties from this block.
+    It will retain its base style of height: fit-content.
+    The body styles from the outer query might still apply to desktop WebKit browsers
+    in landscape, causing the body (grey background) to be 100vh, which is generally fine
+    as the fit-content container will align to the top.
+  */
 }
 
 /* Force portrait mode for iOS PWA if possible, though this is often ignored by iOS */
