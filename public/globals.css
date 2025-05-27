@@ -1100,3 +1100,42 @@ body.dark-mode .instruction-text {
     background-position: 200% 0;
   }
 }
+
+/* iOS specific styles for orientation and scrolling */
+@media screen and (orientation: landscape) and (-webkit-min-device-pixel-ratio: 0) {
+  body {
+    /* Ensure body remains scrollable in landscape on iOS */
+    overflow-y: scroll;
+    min-height: 100vh; /* Ensure it takes full viewport height */
+    -webkit-overflow-scrolling: touch; /* Enable smooth scrolling on iOS */
+  }
+
+  /* You might need to adjust specific container heights if they are fixed */
+  .container {
+    min-height: 100vh; /* Ensure the main container also takes full height */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start; /* Align content to the top */
+  }
+}
+
+/* Force portrait mode for iOS PWA if possible, though this is often ignored by iOS */
+@media all and (display-mode: standalone) and (orientation: landscape) {
+  html {
+    /* Attempt to keep content in portrait aspect ratio */
+    transform: rotate(90deg);
+    transform-origin: left top;
+    width: 100vh;
+    height: 100vw;
+    overflow: hidden; /* Hide scrollbars from the rotation */
+    position: absolute;
+    top: 100%;
+    left: 0;
+  }
+  body {
+    width: 100vw;
+    height: 100vh;
+    overflow-y: scroll; /* Re-enable scrolling for the rotated content */
+    -webkit-overflow-scrolling: touch;
+  }
+}
