@@ -112,7 +112,9 @@ const UkrainianCalendar = () => {
         ((diffInDays % SHIFT_CYCLE_VALUES.length) + SHIFT_CYCLE_VALUES.length) %
         SHIFT_CYCLE_VALUES.length;
       const calculatedShift = SHIFT_CYCLE_VALUES[cycleIndex];
-      console.log(`[getShiftForDate] Target: ${targetDate.toLocaleDateString()}, Base: ${baseDateMidnight.toLocaleDateString()}, DiffDays: ${diffInDays}, CycleIndex: ${cycleIndex}, CalculatedShift: ${calculatedShift}`);
+      console.log(
+        `[getShiftForDate] Target: ${targetDate.toLocaleDateString()}, Base: ${baseDateMidnight.toLocaleDateString()}, DiffDays: ${diffInDays}, CycleIndex: ${cycleIndex}, CalculatedShift: ${calculatedShift}`
+      );
       return calculatedShift;
     },
     []
@@ -298,35 +300,40 @@ const UkrainianCalendar = () => {
     return currentShiftIndexRefFromState.current; // ВИКОРИСТОВУЙТЕ РЕФ, А НЕ СТАН З ЗАМИКАННЯ
   }, [getShiftForDate]); // Видаліть selectedShiftIndex з залежностей, він тепер не потрібен тут
 
-  const handleShiftChange = useCallback((newShiftIndex: number, isInternalCall: boolean = false) => {
-    if (isOnlineShiftDetectionActive && !isInternalCall) {
-      console.log("Shift change disabled: Online shift detection is active for manual changes.");
-      return;
-    }
-    setSelectedShiftIndex(newShiftIndex);
-
-    // Use the fixed base date for the selected shift
-    const selectedFixedBase = FIXED_SHIFT_BASE_DATES[newShiftIndex];
-
-    setBaseShiftInfo({
-      year: selectedFixedBase.year,
-      month: selectedFixedBase.month,
-      day: selectedFixedBase.day,
-    });
-
-    // Ensure we are on the current month if the view is not the current month
-    setCurrentDate((prevDate) => {
-      const today = new Date();
-      if (
-        prevDate &&
-        (prevDate.getMonth() !== today.getMonth() ||
-          prevDate.getFullYear() !== today.getFullYear())
-      ) {
-        return new Date();
+  const handleShiftChange = useCallback(
+    (newShiftIndex: number, isInternalCall: boolean = false) => {
+      if (isOnlineShiftDetectionActive && !isInternalCall) {
+        console.log(
+          "Shift change disabled: Online shift detection is active for manual changes."
+        );
+        return;
       }
-      return prevDate;
-    });
-  }, [isOnlineShiftDetectionActive]); // Add isOnlineShiftDetectionActive to dependencies
+      setSelectedShiftIndex(newShiftIndex);
+
+      // Use the fixed base date for the selected shift
+      const selectedFixedBase = FIXED_SHIFT_BASE_DATES[newShiftIndex];
+
+      setBaseShiftInfo({
+        year: selectedFixedBase.year,
+        month: selectedFixedBase.month,
+        day: selectedFixedBase.day,
+      });
+
+      // Ensure we are on the current month if the view is not the current month
+      setCurrentDate((prevDate) => {
+        const today = new Date();
+        if (
+          prevDate &&
+          (prevDate.getMonth() !== today.getMonth() ||
+            prevDate.getFullYear() !== today.getFullYear())
+        ) {
+          return new Date();
+        }
+        return prevDate;
+      });
+    },
+    [isOnlineShiftDetectionActive]
+  ); // Add isOnlineShiftDetectionActive to dependencies
 
   const saveShift = useCallback(() => {
     if (isOnlineShiftDetectionActive) {
@@ -350,10 +357,21 @@ const UkrainianCalendar = () => {
   }, [baseShiftInfo, savedShiftBaseDay, isOnlineShiftDetectionActive]);
 
   const clearShift = useCallback(() => {
-    // 1. Return to the current month
+    // Always return to the current month
     setCurrentDate(new Date());
 
-    // 2. Set the shift slider to the shift saved in localStorage
+    if (isOnlineShiftDetectionActive) {
+      // If online detection is active, only return to current month, do not change shift
+      console.log(
+        "Clear Shift: Online detection active, only returning to current month."
+      );
+      return;
+    }
+
+    // If online detection is NOT active, proceed with setting the shift from localStorage
+    console.log(
+      "Clear Shift: Online detection inactive, setting shift from localStorage."
+    );
     const savedDay = localStorage.getItem("savedBaseDay");
     let targetShiftInfo: ShiftInfo;
     let targetVisualShiftIndex: number;
@@ -361,22 +379,19 @@ const UkrainianCalendar = () => {
     if (savedDay) {
       const savedDayInt = parseInt(savedDay);
       if (!isNaN(savedDayInt) && savedDayInt >= 1 && savedDayInt <= 4) {
-        // Assuming days 1-4 correspond to shifts 1-4
         const foundIndex = FIXED_SHIFT_BASE_DATES.findIndex(
           (shift) => shift.day === savedDayInt
         );
         if (foundIndex !== -1) {
           targetShiftInfo = FIXED_SHIFT_BASE_DATES[foundIndex];
-          targetVisualShiftIndex = foundIndex; // Assuming visual index matches array index
+          targetVisualShiftIndex = foundIndex;
         } else {
-          // Fallback to Shift 1 if saved day doesn't match a fixed base date
           targetShiftInfo = FIXED_SHIFT_BASE_DATES[0];
           targetVisualShiftIndex = 0;
-          localStorage.removeItem("savedBaseDay"); // Clear invalid saved day
+          localStorage.removeItem("savedBaseDay");
           setSavedShiftBaseDay(null);
         }
       } else {
-        // No saved shift, default to Shift 1
         targetShiftInfo = FIXED_SHIFT_BASE_DATES[0];
         targetVisualShiftIndex = 0;
       }
@@ -384,7 +399,7 @@ const UkrainianCalendar = () => {
       setBaseShiftInfo(targetShiftInfo);
       setSelectedShiftIndex(targetVisualShiftIndex);
     }
-  }, []); // No dependencies needed for clearShift as it uses internal state and localStorage
+  }, [isOnlineShiftDetectionActive]); // Add isOnlineShiftDetectionActive to dependencies
 
   useEffect(() => {
     setIsClient(true); // Set to true once component mounts on client side
@@ -454,13 +469,43 @@ const UkrainianCalendar = () => {
 
   useEffect(() => {
     if (isClient) {
-      // Ensure localStorage is available
       localStorage.setItem(
         "isOnlineShiftDetectionActive",
         String(isOnlineShiftDetectionActive)
       );
     }
-  }, [isOnlineShiftDetectionActive, isClient]);
+    // When online detection is turned OFF, apply the saved shift
+    if (isClient && !isOnlineShiftDetectionActive) {
+      console.log("Online detection turned OFF. Applying saved shift.");
+      const savedDay = localStorage.getItem("savedBaseDay");
+      let targetShiftInfo: ShiftInfo;
+      let targetVisualShiftIndex: number;
+
+      if (savedDay) {
+        const savedDayInt = parseInt(savedDay);
+        const foundIndex = FIXED_SHIFT_BASE_DATES.findIndex(
+          (shift) => shift.day === savedDayInt
+        );
+
+        if (foundIndex !== -1) {
+          targetShiftInfo = FIXED_SHIFT_BASE_DATES[foundIndex];
+          targetVisualShiftIndex = foundIndex;
+        } else {
+          targetShiftInfo = FIXED_SHIFT_BASE_DATES[0];
+          targetVisualShiftIndex = 0;
+          localStorage.removeItem("savedBaseDay");
+          setSavedShiftBaseDay(null);
+        }
+      } else {
+        targetShiftInfo = FIXED_SHIFT_BASE_DATES[0];
+        targetVisualShiftIndex = 0;
+      }
+
+      setBaseShiftInfo(targetShiftInfo);
+      setSelectedShiftIndex(targetVisualShiftIndex);
+      setCurrentDate(new Date()); // Also ensure we are on the current month
+    }
+  }, [isOnlineShiftDetectionActive, isClient, setBaseShiftInfo, setSelectedShiftIndex, setSavedShiftBaseDay]); // Added dependencies
 
   useEffect(() => {
     if (isClient) {
@@ -564,8 +609,12 @@ const UkrainianCalendar = () => {
     if (scheduleNextCheckRef.current) {
       scheduleNextCheckRef.current();
     }
-  }, [isOnlineRef, determineCurrentShiftIndex, currentShiftIndexRefFromState, handleShiftChange]);
-
+  }, [
+    isOnlineRef,
+    determineCurrentShiftIndex,
+    currentShiftIndexRefFromState,
+    handleShiftChange,
+  ]);
 
   const scheduleNextCheck = useCallback(() => {
     if (timeoutIdRef.current) {
@@ -592,7 +641,9 @@ const UkrainianCalendar = () => {
     }
 
     const msUntilNextChange = nextChangeTime.getTime() - now.getTime();
-    console.log(`[scheduleNextCheck] Scheduling next check. Now: ${now.toISOString()}, Next change at: ${nextChangeTime.toISOString()}, MS until: ${msUntilNextChange}`);
+    console.log(
+      `[scheduleNextCheck] Scheduling next check. Now: ${now.toISOString()}, Next change at: ${nextChangeTime.toISOString()}, MS until: ${msUntilNextChange}`
+    );
 
     if (msUntilNextChange <= 0) {
       console.log(
@@ -630,7 +681,9 @@ const UkrainianCalendar = () => {
       const initialUpdateAndSchedule = () => {
         const currentInitialTime = new Date();
         console.log(
-          `[Effect isOnline] Initial call to initialUpdateAndSchedule. Current time: ${currentInitialTime.toISOString()}, isOnlineRef.current: ${isOnlineRef.current}`
+          `[Effect isOnline] Initial call to initialUpdateAndSchedule. Current time: ${currentInitialTime.toISOString()}, isOnlineRef.current: ${
+            isOnlineRef.current
+          }`
         );
         if (!isOnlineRef.current) {
           console.log(
@@ -653,7 +706,6 @@ const UkrainianCalendar = () => {
         scheduleNextCheck(); // Запускаємо цикл планування
       };
       initialUpdateAndSchedule();
-
     } else {
       console.log(
         "[Effect isOnline] Deactivating online detection. Clearing timeout."
@@ -843,12 +895,8 @@ const UkrainianCalendar = () => {
               {isClientMounted && (
                 <div
                   onClick={() => {
-                    if (isOnlineShiftDetectionActive) {
-                      // If currently active, and user is turning it OFF
-                      clearShift(); // Revert to saved shift or default
-                    }
                     setIsOnlineShiftDetectionActive(
-                      !isOnlineShiftDetectionActive
+                      (prev) => !prev
                     );
                   }}
                   className="icon-button"
