@@ -1120,22 +1120,12 @@ body.dark-mode .instruction-text {
 }
 
 /* Force portrait mode for iOS PWA if possible, though this is often ignored by iOS */
+/* Removed aggressive html transformations as they caused layout issues */
 @media all and (display-mode: standalone) and (orientation: landscape) {
-  html {
-    /* Attempt to keep content in portrait aspect ratio */
-    transform: rotate(90deg);
-    transform-origin: left top;
-    width: 100vh;
-    height: 100vw;
-    overflow: hidden; /* Hide scrollbars from the rotation */
-    position: absolute;
-    top: 100%;
-    left: 0;
-  }
   body {
-    width: 100vw;
-    height: 100vh;
-    overflow-y: scroll; /* Re-enable scrolling for the rotated content */
-    -webkit-overflow-scrolling: touch;
+    /* Ensure body remains scrollable in landscape on iOS */
+    overflow-y: scroll;
+    min-height: 100vh; /* Ensure it takes full viewport height */
+    -webkit-overflow-scrolling: touch; /* Enable smooth scrolling on iOS */
   }
 }
