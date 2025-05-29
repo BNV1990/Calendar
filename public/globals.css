@@ -157,10 +157,22 @@ body.dark-mode .hours-summary span {
 }
 
 body.dark-mode .tooltip {
-  background-color: #3a3a3a; /* Dark tooltip background */
-  color: #e0e0e0; /* Light text */
-  border-color: #555; /* Darker border */
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5); /* Darker shadow */
+  position: absolute;
+  bottom: 100%; /* Position above the button */
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #fff;
+  color: #333;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  white-space: nowrap; /* Prevent text wrapping */
+  z-index: 10; /* Ensure it's above other elements */
+  margin-bottom: 5px; /* Space between tooltip and button */
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 body.dark-mode .tooltip-close-button {
@@ -249,7 +261,8 @@ body.dark-mode .instruction-text {
 .toggleContainer {
   display: flex;
   position: relative;
-  width: 360px; /* Або інша ширина, яка відповідає дизайну. Збільште, якщо текст не вміщується. */
+  width: 100%; /* Make it responsive */
+  max-width: 360px; /* Keep original max-width for larger screens */
   height: 40px;
   background-color: #f0f0f0;
   border-radius: 20px; /* Як на зображенні */
@@ -649,8 +662,7 @@ body.dark-mode .instruction-text {
   #calendar-table td {
     padding: 6px 1px; /* Keep some padding */
     font-size: 0.7em; /* Smaller font */
-    min-width: 35px; /* Minimum width for cells */
-    min-height: 35px; /* Minimum height for cells */
+    /* Removed min-width and min-height to allow cells to shrink further */
     aspect-ratio: 1 / 1; /* Force square aspect ratio */
     /* Revert flex properties that broke table layout */
     /* display: flex; */
@@ -686,7 +698,7 @@ body.dark-mode .instruction-text {
 
   .calendar-table-container {
     width: 100%; /* Ensure container takes full width */
-    overflow-x: auto; /* Enable horizontal scrolling */
+    /* Removed overflow-x: auto to prevent horizontal scrolling */
   }
 
   .hours-summary h3 {
@@ -1112,7 +1124,7 @@ body.dark-mode .instruction-text {
   }
 
   /* You might need to adjust specific container heights if they are fixed */
-  /* Apply container specific min-height AND related flex properties ONLY on touch devices 
+  /* Apply container specific min-height AND related flex properties ONLY on touch devices
      that also match the outer query conditions. */
   @media (hover: none) and (pointer: coarse) {
     .container {
@@ -1141,5 +1153,26 @@ body.dark-mode .instruction-text {
     overflow-y: scroll;
     min-height: 100vh; /* Ensure it takes full viewport height */
     -webkit-overflow-scrolling: touch; /* Enable smooth scrolling on iOS */
+  }
+}
+
+/* Specific adjustments for very small screens (e.g., 375px wide) */
+@media (max-width: 600px) { /* Changed from 400px to 600px to apply to more small screens */
+  body {
+    padding: 10px; /* Reduce body padding on very small screens */
+  }
+
+  .container {
+    padding: 10px; /* Reduce container padding on very small screens, even more */
+  }
+}
+
+@media (max-width: 370px) { /* New media query for extremely small screens */
+  body {
+    padding: 5px; /* Even smaller body padding */
+  }
+
+  .container {
+    padding: 5px; /* Even smaller container padding */
   }
 }
