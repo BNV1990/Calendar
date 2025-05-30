@@ -418,6 +418,11 @@ const UkrainianCalendar = () => {
       setShowHoursSummary(savedHoursSummaryState === "true");
     }
 
+    const savedLegendState = localStorage.getItem("showLegend");
+    if (savedLegendState !== null) {
+      setShowLegend(savedLegendState === "true");
+    }
+
     const savedOnlineShiftDetectionState = localStorage.getItem(
       "isOnlineShiftDetectionActive"
     );
@@ -459,6 +464,13 @@ const UkrainianCalendar = () => {
       localStorage.setItem("showHoursSummary", String(showHoursSummary));
     }
   }, [showHoursSummary, isClient]);
+
+  useEffect(() => {
+    if (isClient) {
+      // Ensure localStorage is available
+      localStorage.setItem("showLegend", String(showLegend));
+    }
+  }, [showLegend, isClient]);
 
   useEffect(() => {
     if (isClient) {
