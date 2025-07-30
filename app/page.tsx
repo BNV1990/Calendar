@@ -92,6 +92,32 @@ const UkrainianCalendar = () => {
   const currentShiftIndexRefFromState = useRef(selectedShiftIndex); // Реф для selectedShiftIndex (як ви вже мали)
   const scheduleNextCheckRef = useRef<(() => void) | null>(null); // Ref for scheduleNextCheck
 
+  const calculateDayNightHoursForShift = (shiftType: string, part: 'full' | 'start' | 'end') => {
+    // Night hours in Ukraine are from 22:00 to 06:00
+    if (shiftType === 'D') {
+        // Day shift 08:00 - 20:00. All 12 hours are day hours.
+        return { day: 12, night: 0 };
+    }
+
+    if (shiftType === 'N') {
+        // Night shift 20:00 - 08:00
+        if (part === 'start') {
+            // Part from 20:00 to 24:00 on the first day
+            // Day part: 20:00-22:00 (2 hours)
+            // Night part: 22:00-24:00 (2 hours)
+            return { day: 2, night: 2 };
+        }
+        if (part === 'end') {
+            // Part from 00:00 to 08:00 on the second day
+            // Night part: 00:00-06:00 (6 hours)
+            // Day part: 06:00-08:00 (2 hours)
+            return { day: 2, night: 6 };
+        }
+    }
+
+    return { day: 0, night: 0 };
+  };
+
   const getShiftForDate = useCallback(
     (targetDate: Date, bsInfo: ShiftInfo | null): string | null => {
       if (!bsInfo) return null;
@@ -174,37 +200,50 @@ const UkrainianCalendar = () => {
               baseShiftInfo
             );
 
-            // Check if the current cell is the selected base shift day
+            let dailyTotalHours = 0;
+            let dailyDayHours = 0;
+            let dailyNightHours = 0;
+
+            // Determine shift type, class name, and calculate hours
+            if (shiftTypeForCell === "D") {
+              cellClassName = "day-shift";
+              const { day, night } = calculateDayNightHoursForShift('D', 'full');
+              dailyDayHours += day;
+              dailyNightHours += night;
+            } else if (shiftTypeForCell === "N") {
+              cellClassName = "night-shift";
+              const { day, night } = calculateDayNightHoursForShift('N', 'start');
+              dailyDayHours += day;
+              dailyNightHours += night;
+            } else if (shiftTypeForCell === "O1" || shiftTypeForCell === "O2") {
+              cellClassName = "off-day";
+              // This is an off day, but might have hours from previous night shift
+              if (shiftTypeForPrevDay === "N") {
+                const { day, night } = calculateDayNightHoursForShift('N', 'end');
+                dailyDayHours += day;
+                dailyNightHours += night;
+              }
+            }
+            
+            dailyTotalHours = dailyDayHours + dailyNightHours;
+            
+            if (dailyTotalHours > 0) {
+                hoursTextForThisCell = `+${dailyTotalHours}`;
+            }
+
+            currentMonthTotalHours += dailyTotalHours;
+            currentMonthDayHours += dailyDayHours;
+            currentMonthNightHours += dailyNightHours;
+
+            // Check if the current cell is the selected base shift day for highlighting
             if (
               cellDate.getFullYear() === baseShiftInfo.year &&
               cellDate.getMonth() === baseShiftInfo.month &&
               cellDate.getDate() === baseShiftInfo.day
             ) {
-              cellClassName = "day-shift highlight-day-shift";
+              // The base day is always a 'D' shift, so its class is already day-shift
+              cellClassName += " highlight-day-shift"; // Append class
               dayNumberStyle = { fontWeight: "bold" };
-              hoursTextForThisCell = "+12"; // Always add +12 for the base shift day
-              currentMonthDayHours += 12;
-              currentMonthTotalHours += 12;
-            } else {
-              // For other days, apply shift logic based on calculated shiftTypeForCell
-              if (shiftTypeForCell === "D") {
-                cellClassName = "day-shift";
-                hoursTextForThisCell = "+12";
-                currentMonthDayHours += 12;
-                currentMonthTotalHours += 12;
-              } else if (shiftTypeForCell === "N") {
-                cellClassName = "night-shift";
-                hoursTextForThisCell = "+4";
-                currentMonthNightHours += 4;
-                currentMonthTotalHours += 4;
-              } else if (
-                (shiftTypeForCell === "O1" || shiftTypeForCell === "O2") &&
-                shiftTypeForPrevDay === "N"
-              ) {
-                hoursTextForThisCell = "+8";
-                currentMonthNightHours += 8;
-                currentMonthTotalHours += 8;
-              }
             }
 
             if (hoursTextForThisCell !== "") {
